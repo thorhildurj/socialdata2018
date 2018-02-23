@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>D3 Page Template Þórhildur</title>
+        <script type="text/javascript" src="d3.js"></script>
+        <style>
+            div.bar {
+                display: inline-block;
+                width: 20px;
+                height: 75px; /* We'll override height later */
+                background-color: teal;
+                margin-right: 2px;
+            }
+
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript">
+
+          d3.csv("president-data.csv", function(dataset) {
+
+          //Width and height
+             var w = 1000;
+             var h = 100;
+
+            //create an empty DOM
+           var svg = d3.select("body")
+                         .append("svg")
+                         .attr("width", w)
+                         .attr("height", h);
+
+
+           svg.selectAll("circle")
+             .data(dataset)
+             .enter()
+             .append("circle")
+             .attr("cx", function(d) {
+                 return d.Months;
+             })
+             .attr("cy", h/2)
+             .attr("r", 5);
+
+
+          })
+
+        </script>
+
+
+
+    </body>
+</html>
