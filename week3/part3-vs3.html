@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>D3: Adding and removing values from a chart (dynamic labels included)</title>
+		<script type="text/javascript" src="../d3.js"></script>
+		<style type="text/css">
+			/* No style rules here yet */
+		</style>
+	</head>
+	<body>
+		<p>
+			This is a reproduction of http://iquantny.tumblr.com/post/129373499164/this-is-quantifiably-the-best-month-to-go-to-the
+		</p>
+
+		<h1>I Quant NY</h1>
+		<p>September 18, 2015</p>
+		<h2> <a href="http://iquantny.tumblr.com/post/129373499164/this-is-quantifiably-the-best-month-to-go-to-the">This is Quantifiably the Best Month to go to the Farmers Market</a></h2>
+		<p>
+			As part of a homework assignment, I ask my students at Pratt to go out and chart something of interest to them,
+			and <a href="https://www.linkedin.com/in/kvsavarese">Katherine Savarese</a> came back with a simple chart about farmers markets that I loved- it inspired this post.
+			You probably know that farmers markets are a staple across <a href="http://www.grownyc.org/files/gmkt/map.pdf">all five boroughs</a> of New York City, but September happens
+			to be a very special month. Why is that?  Well, it turns out September is the month with the most unique types of
+			fresh produce - forty three to be exact.
+			To show the current offerings, we charted how many types of fruits and vegetables are available by month, and showed if
+			they were fresh or from storage.
+		</p>
+
+		<p>HERE IS THE BAR CHART!!!!!!!!!!!!!</p>
+
+		<p>
+			If you miss the month of September, you might be behind the fruit curve, but there are
+			 plenty more months of vegetables left.  The chart shows that fresh vegetables are
+			 available 9 out of 12 months, but fruit is only available 5 out of 12.
+			 Now if only we could quantify how delicious the produce is…
+		</p>
+
+		<p>
+			Data from: <a href="http://www.grownyc.org/greenmarket/whatsavailable">  http://www.grownyc.org/greenmarket/whatsavailable</a>
+		</p>
+
+
+		<script type="text/javascript">
+
+		var w = 500;
+    var h = 300;
+    var padding = 20;
+
+		//How to get external data
+		var dataset, xScale, yScale, xAxis, yAxis;
+
+		//function to convert the CSV values to strings
+		var rowConverter = function(d) {
+			return {
+					Index: parseInt(d.Index),
+					Month: d.Month,
+					Count: parseInt(d.Count)
+			};
+		}
+
+
+		d3.csv("data-food2.csv", rowConverter, function(data) {
+
+				dataset = data;
+
+				yScale = d3.scaleLinear()
+           				.domain([0,
+													d3.max(dataset, function(d) { return d.Count; })])
+									.range([padding, h-padding]);
+
+				//creating the x- og y-axis
+				//xAxis = d3.axisBottom(xScale);
+				yAxis = d3.axisLeft(yScale);
+
+
+				//Create the svg element
+				 var svg = d3.select("body")
+											 .append("svg")
+											 .attr("width", w)
+											 .attr("height", h);
+
+				//Create bars
+					svg.selectAll("rect")
+					   .data(dataset)
+					   .enter()
+					   .append("rect")
+					   .attr("x", function(d,i){
+							 return i*(w / dataset.length);
+						 })
+					   .attr("y", function(d){
+							 return h - yScale(d.Count);
+						 })
+						 .attr("width", w / dataset.length - padding)
+						 .attr("height", function(d){
+							 		return yScale(d.Count);
+						 })
+						 .attr("fill", function(d) {
+							return "rgb(0, 0, " + Math.round(d.Count * 10) + ")";
+					   });
+
+				 //Create Y axis
+				 svg.append("g")
+						 .attr("class", "axis")
+						 .attr("transform", "translate(" + padding + ",0)")
+						 .call(yAxis);
+
+
+		});
+
+
+		</script>
+	</body>
+</html>

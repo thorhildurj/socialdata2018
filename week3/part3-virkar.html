@@ -43,9 +43,30 @@
 			<p id="remove">Remove a data value</p>
 
 		<script type="text/javascript">
+
+		//How to get external data
+		/*var dataset2
+
+		d3.csv("data-food.cvs", function(f) {
+					  dataset2 = f;
+		}*/
+
+
+
+			var dataset, xScale, yScale, xAxis, yAxis;  //Empty, for now
+
+			//function to convert the CSV values to strings
+			var rowConverter = function(d) {
+				return {
+						Date: parse(d.Month), //ekki viss með þetta, vil ná mánuðunum, x-ás
+						Amount: parseInt(d.Count) //y-ás
+				};
+			}
+
 			//Width and height
 			var w = 600;
 			var h = 250;
+			var padding = 20;
 
 			var dataset = [ { key: 0, value: 5 },		//dataset is now an array of objects.
 							{ key: 1, value: 10 },		//Each object has a 'key' and a 'value'.
@@ -77,6 +98,16 @@
 							.domain([0, d3.max(dataset, function(d) { return d.value; })])
 							.range([0, h]);
 
+
+			//creating the x-axis
+			var xAxis = d3.axisBottom(xScale)
+										.ticks(5)
+
+			//Define Y axis
+			var yAxis = d3.axisLeft()
+											.scale(yScale)
+											.ticks(5);
+
 			//Define key function, to be used when binding data
 			var key = function(d) {
 				return d.key;
@@ -105,6 +136,8 @@
 			   .attr("fill", function(d) {
 					return "rgb(0, 0, " + (d.value * 10) + ")";
 			   });
+
+
 			//Create labels
 			svg.selectAll("text")
 			   .data(dataset, key)
@@ -123,6 +156,22 @@
 			   .attr("font-family", "sans-serif")
 			   .attr("font-size", "11px")
 			   .attr("fill", "white");
+
+
+				 //adding new element g that is invisible
+				 svg.append("g")
+						 .attr("class", "axis")  //assign axis class
+						 .attr("transform", "translate(0," + (h - padding) + ")")
+						 .call(xAxis);
+
+				 //Create Y axis
+				 svg.append("g")
+						 .attr("class", "axis")
+						 .attr("transform", "translate(" + padding + ",0)")
+						 .call(yAxis);
+
+
+
 			//On click, update with new data
 			d3.selectAll("p")
 				.on("click", function() {

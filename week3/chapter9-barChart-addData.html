@@ -33,6 +33,7 @@
 						.append("svg")
 						.attr("width", w)
 						.attr("height", h);
+
 			//Create bars
 			svg.selectAll("rect")
 			   .data(dataset)
@@ -51,6 +52,7 @@
 			   .attr("fill", function(d) {
 					return "rgb(0, 0, " + Math.round(d * 10) + ")";
 			   });
+
 			//Create labels
 			svg.selectAll("text")
 			   .data(dataset)
