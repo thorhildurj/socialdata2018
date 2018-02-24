@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Assignment 1</title>
+        <script type="text/javascript" src="./d3.js"></script>
+        <style>
+            body {
+               width: 100%;
+               display: flex;
+               justify-content: center;
+               flex-direction: row;
+               line-height: 150%;
+            }
+
+            a {
+              color: #0F6F9F;
+              text-decoration: none;
+            }
+
+            a:hover {
+              color: red;
+            }
+
+            .body-content {
+              max-width: 800px;
+            }
+
+            .assignment-header {
+              color: #0d8291;
+              font-size: 450%;
+            }
+
+            .part-header {
+              font-size: 250%;
+              color: #0d8291;
+              text-decoration: underline;
+            }
+
+            .scroll-nav {
+              cursor: pointer;
+              color: blue;
+              text-decoration: underline;
+            }
+
+            .thin-line {
+              width: 100%;
+              height: 1px;
+              background-color: black;
+            }
+
+            .thick-line {
+              width: 100%;
+              height: 4px;
+              background-color: black;
+            }
+
+            .small_text {
+              font-size: 78%;
+            }
+
+            #part3-chart {
+              /*border-style: solid;*/
+            }
+
+            .part3-chart-container {
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              margin: 10px;
+              border-style: double;
+              border-width: 3px;
+              border-color: black;
+            }
+
+            .chart-option {
+              cursor: pointer;
+              color: black !important;
+            }
+
+            .option-fresh-fruit {
+              color: #ff2419;
+              list-style-type: square;
+            }
+
+            .option-fresh-vegetable {
+              color: #018215;
+              list-style-type: square;
+            }
+
+            .option-storage-fruit {
+              color: #ff9397;
+              list-style-type: square;
+            }
+
+            .option-storage-vegetable {
+              color: #dae4c3;
+              list-style-type: square;
+            }
+
+            .grid{ /* styling for the grid lines */
+/*
+                stroke: red;
+                opacity: 0.7;
+                */
+                stroke: #999999;
+                color: green;
+                background-color: green;
+                stroke: red;
+            }
+            .grid path { /* styling for the grid lines */
+              stroke-width: 0; /* to make the axis not thicker */
+            }
+
+            div.bar {
+                display: inline-block;
+                width: 20px;
+                height: 75px; /* We'll override height later */
+                background-color: teal;
+                margin-right: 2px;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div class="body-content">
+          <h1 class="assignment-header">Assignment 1</h1>
+
+          <p>
+            Here you can scroll to specific part of the assignment:
+          </p>
+          <ol>
+            <li class="scroll-nav" id="scroll1">Part1</li>
+            <li class="scroll-nav" id="scroll2">Part2</li>
+            <li class="scroll-nav" id="scroll3">Part3</li>
+            <li class="scroll-nav" id="scroll4">Part4</li>
+          </ol>
+
+          <!-- ########################  PART 1  ####################### -->
+          <br />
+          <br />
+          <h2 class="part-header" id="part1">Part 1: DAOST Chapter 2 Questions</h2>
+          <p>
+            ...
+          </p>
+
+
+          <!-- ########################  PART 2  ####################### -->
+          <br />
+          <br />
+          <h2 class="part-header" id="part2">Part 2: DAOST Chapter 3 Questions</h2>
+          <p>
+            ...
+          </p>
+
+
+          <!-- ########################  PART 3  ####################### -->
+          <br />
+          <br />
+          <h2 class="part-header" id="part3">Part 3: Viz 1</h2>
+          <p>
+            <i>This is a reproduction of http://iquantny.tumblr.com/post/129373499164/this-is-quantifiably-the-best-month-to-go-to-the</i>
+          </p>
+          <br/>
+
+          <div>
+            <div class="thin-line"/>
+    				<p  class="small_text">
+              Quantitative Analysis of NYC Open Data: Every data set that the city releases tells a story. This blog is all about telling those stories, one data set at a time.&nbsp;&nbsp;
+            </p>
+
+            <a href="/about" class="small_text">About Me</a>&nbsp;&nbsp;
+            <a href="/aboutyou" class="small_text">About You</a>&nbsp;&nbsp;
+            <a href="/interviews" class="small_text">Interviews</a>&nbsp;&nbsp;
+            <a href="/press" class="small_text">Press</a>&nbsp;&nbsp;
+            <a href="/topics" class="small_text">Topics</a>&nbsp;&nbsp;
+            <a href="/subscribe" class="small_text">Subscribe</a>&nbsp;&nbsp;
+            <div class="thick-line"/>
+    			</div>
+
+          <div id="newDay">
+
+          <br/>
+
+          <div class="date">
+            <b style="font-size: 80%">September 18, 2015</b>
+          </div>
+
+          <div class="post">
+            <a href="http://iquantny.tumblr.com/post/129373499164/this-is-quantifiably-the-best-month-to-go-to-the" style="color:black; text-decoration:none;font-size:180%;line-height:130%;"><h2 style="font-style:bolder;">This is Quantifiably the Best Month to go to the Farmers Market</h2></a>
+            <p></p><p>As part of a homework assignment, I ask my students at Pratt to go out and chart something of interest to them, and <a href="https://t.umblr.com/redirect?z=https%3A%2F%2Fwww.linkedin.com%2Fin%2Fkvsavarese&amp;t=NmE2YmYyYjU4NTI3MTFhYWFiMWE1ZjFhNzc1NmUzMmE0ZDQ4OGM2NSwxeHM2a1phNg%3D%3D&amp;b=t%3A5jlxwUw4OZ-2SbgNDPgKMQ&amp;p=http%3A%2F%2Fiquantny.tumblr.com%2Fpost%2F129373499164%2Fthis-is-quantifiably-the-best-month-to-go-to-the&amp;m=1">Katherine Savarese</a> came back with a simple chart about farmers markets that I loved- it inspired this post.</p><p>You probably know that farmers markets are a staple across <a href="https://t.umblr.com/redirect?z=http%3A%2F%2Fwww.grownyc.org%2Ffiles%2Fgmkt%2Fmap.pdf&amp;t=MGM4YmRjZjQ2ZmFmYzBiYmMzMmY5NDU2MTdiNzMzMmYyOWQ5YjQ2ZSwxeHM2a1phNg%3D%3D&amp;b=t%3A5jlxwUw4OZ-2SbgNDPgKMQ&amp;p=http%3A%2F%2Fiquantny.tumblr.com%2Fpost%2F129373499164%2Fthis-is-quantifiably-the-best-month-to-go-to-the&amp;m=1">all five boroughs</a> of New York City, but September happens to be a very special month.  Why is that? &nbsp;Well, it turns out September is the month with the most unique types of fresh produce- forty three to be exact.</p><p>To show the current offerings, we charted how many types of fruits and vegetables are available by month, and showed if they were fresh or from storage.&nbsp;</p>
+            <div class="part3-chart-container">
+              <div id="part3-chart">
+
+              </div>
+              <ul>
+                <li onclick="updateChartBar(0)" class="option-fresh-fruit"><span class="chart-option">Fresh Fruit</span></li>
+                <li onclick="updateChartBar(2)" class="option-fresh-vegetable"><span class="chart-option">Fresh Vegetable</span></li>
+                <li onclick="updateChartBar(1)" class="option-storage-fruit"><span class="chart-option">Storage Fruit</span></li>
+                <li onclick="updateChartBar(3)" class="option-storage-vegetable"><span class="chart-option">Storage Vegetable</span></li>
+              </ul>
+            </div>
+
+            <p>If you miss the month of September, you might be behind the fruit curve, but there are plenty more months of vegetables left. &nbsp;The chart shows that fresh vegetables are available 9 out of 12 months, but fruit is only available 5 out of 12. Now if only we could quantify how delicious the produce is…&nbsp;</p><p>—–</p><p>Data from:&nbsp;
+            <a href="https://t.umblr.com/redirect?z=http%3A%2F%2Fwww.grownyc.org%2Fgreenmarket%2Fwhatsavailable&amp;t=MWU3YTNhNmYwMDJkNWUwNWQzOTUwMTZjMzJlMGNhM2E3YzdlNTIxMCwxeHM2a1phNg%3D%3D&amp;b=t%3A5jlxwUw4OZ-2SbgNDPgKMQ&amp;p=http%3A%2F%2Fiquantny.tumblr.com%2Fpost%2F129373499164%2Fthis-is-quantifiably-the-best-month-to-go-to-the&amp;m=1">http://www.grownyc.org/greenmarket/whatsavailable</a></p><p></p>
+
+
+
+          <!-- ########################  PART 4  ####################### -->
+          <br />
+          <br />
+          <h2 class="part-header" id="part4">Part 4: Viz 2</h2>
+        </div>
+
+
+        <script type="text/javascript">
+
+
+          /**********************************
+          ********** SCROLL LOGIC ***********
+          ***********************************/
+
+          document.getElementById("scroll1").onclick = function() {
+            console.log("clicking");
+            var elmnt = document.getElementById("part1");
+            elmnt.scrollIntoView();
+          };
+
+          document.getElementById("scroll2").onclick = function() {
+            console.log("clicking");
+            var elmnt = document.getElementById("part2");
+            elmnt.scrollIntoView();
+          };
+
+          document.getElementById("scroll3").onclick = function() {
+            console.log("clicking");
+            var elmnt = document.getElementById("part3");
+            elmnt.scrollIntoView();
+          };
+
+          document.getElementById("scroll4").onclick = function() {
+            console.log("clicking");
+            var elmnt = document.getElementById("part4");
+            elmnt.scrollIntoView();
+          };
+
+
+
+          /****************************
+          ********** PART 3 ***********
+          *****************************/
+
+
+          // Lets start creating some helper functions
+          var getBarFillColor = function (foodProduceIndexSelected) {
+
+            if (foodProduceIndexSelected === 0) {
+              return "#ff2419";
+            } else if (foodProduceIndexSelected === 1) {
+              return "#018215";
+            } else if (foodProduceIndexSelected === 2) {
+              return "#ff9397";
+            } else if (foodProduceIndexSelected === 3) {
+              return "#dae4c3";
+            }
+          }
+
+          var getSubDataset = function (datasetWithAllTypes, foodProduceIndex) {
+            var dataset = [];
+            for (var i = 0; i < datasetWithAllTypes.length; i++) {
+              var entry = datasetWithAllTypes[i];
+              if (entry.Index === foodProduceIndex) {
+                dataset.push(entry)
+              }
+            }
+
+            return dataset;
+          }
+
+          function make_y_axis(scale, svg) {
+            return d3.axisLeft()
+
+                      .scale(scale)
+                      .ticks(5);
+          }
+
+
+
+          // Next we declare some usefule variables
+          var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+          var w = 480;
+          var h = 300;
+          var datasetWithAllTypes; // the whole dataset with all the sub datasets i.e. fresh fruit, ...
+          var foodProduceIndexSelected = 0; // we always picked fresh fruit sub dataset as default
+          var xScale, yScale, svg, xAxis, yAxis;
+          var padding = 30;
+
+          var rowConverter = function(d) {
+            return {
+              Index: parseInt(d.Index),
+              Month: d.Month,
+              Count: parseInt(d.Count),
+            };
+          }
+
+          // we load the data and display the bar chart
+          d3.csv("green_market.csv", rowConverter, function(data) {
+
+            // pick correct dataset
+            datasetWithAllTypes = data;
+            var dataset = getSubDataset(datasetWithAllTypes, foodProduceIndexSelected);
+
+            // lets create the scales
+            xScale = d3.scaleBand()
+              .domain(months)
+              .rangeRound([padding, w])  // 'rangeRound' enables rounding
+              .paddingInner(0.6);
+
+            yScale = d3.scaleLinear()
+              .domain([0, d3.max(dataset, function(d) { return d.Count; })])
+              .range([h - padding, padding * 2]); // double padding on the top to have room for title
+
+            //Create SVG element
+            svg = d3.select("#part3-chart")
+                    .append("svg")
+                    .attr("width", w)
+                    .attr("height", h);
+
+            // Setting chart lines (really long ticks)
+            svg.append("g")
+               .attr("class", "grid")
+               .call(make_y_axis(yScale, svg)
+                      .tickSize(-w, 0, 0)
+                      .tickFormat("")
+               )
+               .attr("transform", "translate(" + padding + ",0)")
+               ;
+
+            //Create bars
+            svg.selectAll("rect")
+               .data(dataset)
+               .enter()
+               .append("rect")
+               .attr("x", function(d, i) {
+                  return xScale(d.Month);  // Setting x values
+               })
+               .attr("y", function(d) {
+                  return yScale(d.Count);
+               })
+               .attr("width", xScale.bandwidth())
+               .attr("height", function(d) {
+                  return h - yScale(d.Count) - padding;
+               })
+               .attr("fill", function(d) {
+                  return getBarFillColor(foodProduceIndexSelected);
+               });
+
+               // Define X axis
+               xAxis = d3.axisBottom()
+                   .scale(xScale)
+                   .tickValues(months);
+
+               //Define Y axis
+               yAxis = d3.axisLeft()
+                         .scale(yScale)
+                         .ticks(5);
+
+               //Create X axis
+               svg.append("g")
+                  .attr("class", "x axis")
+                  .attr("transform", "translate(0," + (h - padding) + ")")
+                  .call(xAxis);
+
+               //Create Y axis
+               svg.append("g")
+                 .attr("class", "y axis")
+                 .attr("transform", "translate(" + padding + ",0)")
+                 .call(yAxis);
+
+               // Setting the title
+               svg.append("text")
+                  .attr("transform", "rotate(-90)")
+                  .attr("y", 0)
+                  .attr("x",0 - (h / 2))
+                  .attr("dy", "1em")
+                  .style("text-anchor", "middle")
+                  .style("font-weight", "bolder")
+                  .style("font-size", "10px")
+                  .text("# of Unique Kinds of Produce");
+
+               // Setting y label
+               svg.append("text")
+                  .attr("x", w / 2)
+                  .attr("y", padding) // we want little bit of padding from the top
+                  .attr("text-anchor", "middle")
+                  .style("font-size", "19px")
+                  .style("font-weight", "bolder")
+                  .text("NYC Green Market - Unique Produce Types");
+          });
+
+
+          // Defining the update functions which is called when produce type is clicked
+          var updateChartBar = function(foodProduceIndexSelected) {
+            // getting chosed sub dataset
+            var dataset = getSubDataset(datasetWithAllTypes, foodProduceIndexSelected);
+
+            // update y scale and y axis (we don't need to update x scale and axis, it is always the same)
+            yScale.domain([0, d3.max(dataset, function(d) { return d.Count; })]);
+
+
+            // updating all bars
+            svg.selectAll("rect")
+               .data(dataset)
+               .transition()
+               .duration(1000)
+               .attr("x", function(d, i) {
+                  return xScale(d.Month);  // Setting x values
+               })
+               .attr("y", function(d) {
+                  return yScale(d.Count);
+               })
+               .attr("width", xScale.bandwidth())
+               .attr("height", function(d) {
+                  return h - yScale(d.Count) - padding;
+               })
+               .attr("fill", function(d) {
+                   return getBarFillColor(foodProduceIndexSelected);
+               });
+
+
+            //Update X axis
+   					svg.select(".x.axis")
+   				    	.transition()
+   				    	.duration(1000)
+   						  .call(xAxis);
+
+   					//Update Y axis
+   					svg.select(".y.axis")
+   				    	.transition()
+   				    	.duration(1000)
+   						  .call(yAxis);
+          }
+
+        </script>
+    </body>
+</html>
