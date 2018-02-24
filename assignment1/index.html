@@ -68,6 +68,7 @@
               flex-direction: row;
               align-items: center;
               margin: 10px;
+              padding-left: 10px;
               border-style: double;
               border-width: 3px;
               border-color: black;
@@ -103,7 +104,7 @@
                 stroke: red;
                 opacity: 0.7;
                 */
-                stroke: #999999;
+                stroke: #25b898;
                 color: green;
                 background-color: green;
                 stroke: red;
@@ -256,9 +257,9 @@
 
             if (foodProduceIndexSelected === 0) {
               return "#ff2419";
-            } else if (foodProduceIndexSelected === 1) {
-              return "#018215";
             } else if (foodProduceIndexSelected === 2) {
+              return "#018215";
+            } else if (foodProduceIndexSelected === 1) {
               return "#ff9397";
             } else if (foodProduceIndexSelected === 3) {
               return "#dae4c3";
@@ -279,7 +280,6 @@
 
           function make_y_axis(scale, svg) {
             return d3.axisLeft()
-
                       .scale(scale)
                       .ticks(5);
           }
@@ -289,11 +289,11 @@
           // Next we declare some usefule variables
           var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
           var w = 480;
-          var h = 300;
+          var h = 350;
           var datasetWithAllTypes; // the whole dataset with all the sub datasets i.e. fresh fruit, ...
           var foodProduceIndexSelected = 0; // we always picked fresh fruit sub dataset as default
           var xScale, yScale, svg, xAxis, yAxis;
-          var padding = 30;
+          var padding = 40;
 
           var rowConverter = function(d) {
             return {
@@ -328,12 +328,16 @@
 
             // Setting chart lines (really long ticks)
             svg.append("g")
+               .style("stroke", "#25b898")
+               .style("color", "#25b898")
                .attr("class", "grid")
                .call(make_y_axis(yScale, svg)
                       .tickSize(-w, 0, 0)
                       .tickFormat("")
                )
                .attr("transform", "translate(" + padding + ",0)")
+               .style("stroke", "#25b898")
+               .style("color", "#25b898")
                ;
 
             //Create bars
@@ -377,7 +381,7 @@
                  .attr("transform", "translate(" + padding + ",0)")
                  .call(yAxis);
 
-               // Setting the title
+               // Setting y label
                svg.append("text")
                   .attr("transform", "rotate(-90)")
                   .attr("y", 0)
@@ -388,7 +392,7 @@
                   .style("font-size", "10px")
                   .text("# of Unique Kinds of Produce");
 
-               // Setting y label
+               // Setting the title
                svg.append("text")
                   .attr("x", w / 2)
                   .attr("y", padding) // we want little bit of padding from the top
