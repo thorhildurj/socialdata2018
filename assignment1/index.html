@@ -211,6 +211,16 @@
           <br />
           <br />
           <h2 class="part-header" id="part4">Part 4: Viz 2</h2>
+          <div id="marathon_graph">
+
+          </div>
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
         </div>
 
 
@@ -443,6 +453,96 @@
    				    	.transition()
    				    	.duration(1000)
    						  .call(yAxis);
+          }
+
+
+          /****************************
+          ********** PART 4 ***********
+          *****************************/
+
+          // convert to get our data
+          var marathonRowConverter = function(d) {
+            var hours = parseInt(d.Time.substring(0,1));
+            var minutes = parseInt(d.Time.substring(2,4));
+            var totalMinutes = hours * 60 + minutes;
+            return {
+              Year: parseInt(d.Year),
+              Athlete: d.Athlete,
+              CountryState: d.CountryState,
+              Time: totalMinutes,
+              Notes: d.Notes,
+              Foo: "Baaar",
+            };
+          }
+
+          // variables to store our data
+          var menData = null; // the men dataset
+          var womenData = null; // the women dataset
+          var marathonDataset = null; // the selected (visible) dataset (men or women or both)
+
+          // other useful variables which we will use later on
+          var symbol = d3.symbol();
+          var wMarathon = 500; // width of the scatterplot
+          var hMarathon = 300; // height of the scatterplot
+          var paddingMarathon = 30;
+          var xScaleMarathon, yScaleMarathon, xAxisMarathon, yAxisMarathon, svgMarathon;
+
+          // load the marathon data
+          d3.csv("marathon_men.csv", marathonRowConverter, function(data) {
+            menData = data;
+            onMarathonDataLoaded();
+          });
+
+          d3.csv("marathon_women.csv", marathonRowConverter, function(data) {
+            womenData = data;
+            onMarathonDataLoaded();
+          });
+
+          // the function that is called when all data is loaded
+          var onMarathonDataLoaded = function() {
+            // first we check if all the data has been loaded, if not, we return
+            if (!menData ||! womenData) return;
+
+            console.log("menData", menData);
+
+            // our default selected dataset are both men and women
+            var dataset = womenData.concat(menData);
+
+            //Setting the axis
+            xScaleMarathon = d3.scaleLinear()
+                           .domain([d3.min(dataset, function(d) { return d.Year;}) , d3.max(dataset, function(d) { return d.Year;}) ])
+                           .range([paddingMarathon, wMarathon - paddingMarathon * 2]);
+
+            yScaleMarathon = d3.scaleLinear()
+                           .domain([d3.min(dataset, function(d) { return d.Time;}) , d3.max(dataset, function(d) { return d.Time;}) ])
+                           .range([hMarathon - paddingMarathon, paddingMarathon]);
+
+            //creating the axis thing
+            xAxisMarathon = d3.axisBottom(xScaleMarathon)
+                          .ticks(5);
+
+                          //Define Y axis
+            yAxisMarathon = d3.axisLeft()
+                          .scale(yScaleMarathon)
+                          .ticks(5);
+
+            //create an empty DOM
+            svgMarathon = d3.select("#marathon_graph")
+                            .append("svg")
+                            .attr("width", wMarathon)
+                            .attr("height", hMarathon);
+
+
+            var dots = svgMarathon.selectAll(".dots")
+            	.data(dataset)
+            	.enter()
+            	.append("path");
+
+            dots.attr("d", symbol.type(function(d){if(d.Year > 1990){ return d3.symbolCross} else{ return d3.symbolDiamond}}))
+              	.attr('stroke-width',1)
+              	.attr('transform',function(d){ return "translate("+xScaleMarathon(d.Year)+","+yScaleMarathon(d.Time)+")"; });
+
+
           }
 
         </script>
