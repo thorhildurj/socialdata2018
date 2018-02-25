@@ -272,9 +272,9 @@
 
             </div>
             <ul>
-              <li onclick="updateChartBar(0)" class="option-both"><span class="chart-option">Both</span></li>
-              <li onclick="updateChartBar(0)" class="option-men"><span class="chart-option">Men</span></li>
-              <li onclick="updateChartBar(2)" class="option-women"><span class="chart-option">Women</span></li>
+              <li onclick="updateMarathonChart('both')" class="option-both"><span class="chart-option">Both</span></li>
+              <li onclick="updateMarathonChart('men')" class="option-men"><span class="chart-option">Men</span></li>
+              <li onclick="updateMarathonChart('women')" class="option-women"><span class="chart-option">Women</span></li>
             </ul>
           </div>
           <br />
@@ -559,8 +559,7 @@
           var wMarathon = 700; // width of the scatterplot
           var hMarathon = 550; // height of the scatterplot
           var paddingMarathon = 50;
-          var xScaleMarathon, yScaleMarathon, xAxisMarathon, yAxisMarathon, svgMarathon;
-          var line;
+          var xScaleMarathon, yScaleMarathon, xAxisMarathon, yAxisMarathon, svgMarathon, line;
 
           // load the marathon data
           d3.csv("marathon_men.csv", marathonRowConverterMen, function(data) {
@@ -581,7 +580,7 @@
             // our default selected dataset are both men and women
             var dataset = womenData.concat(menData);
 
-            //Setting the axis
+            //Setting the scales
             xScaleMarathon = d3.scaleLinear()
                            .domain([d3.min(dataset, function(d) { return d.Year;}) - 5,
                                     d3.max(dataset, function(d) { return d.Year;}) + 5]) // -5 andd +5 to make little bit spacing
@@ -609,13 +608,13 @@
 
             //Create X axis
             svgMarathon.append("g")
-               .attr("class", "x axis")
+               .attr("class", "xMarathon axisMarathon")
                .attr("transform", "translate(0," + (hMarathon - paddingMarathon) + ")")
                .call(xAxisMarathon);
 
             //Create Y axis
             svgMarathon.append("g")
-              .attr("class", "y axis")
+              .attr("class", "yMarathon axisMarathon")
               .attr("transform", "translate(" + paddingMarathon + ",0)")
               .call(yAxisMarathon);
 
@@ -627,7 +626,7 @@
             //Create line for womanData
             svgMarathon.append("path")
               .datum(womenData)
-              .attr("class", "line")
+              .attr("class", "line women-line")
               .attr("d", line)
               .attr("fill", "none")
               .attr("stroke", "black")
@@ -637,7 +636,7 @@
             //Create line for menData
             svgMarathon.append("path")
               .datum(menData)
-              .attr("class", "line")
+              .attr("class", "line men-line")
               .attr("d", line)
               .attr("fill", "none")
               .attr("stroke", "black")
@@ -661,7 +660,30 @@
                   if(d.Gender === "Man"){ return "red"} else { return "blue"}
                 })
                 .attr("fill", "#00000000")
-              	.attr('transform',function(d){ return "translate("+xScaleMarathon(d.Year)+","+yScaleMarathon(d.Time)+")"; });
+
+                .attr("class", "marathon-dots")
+              	.attr('transform',function(d){ return "translate("+xScaleMarathon(d.Year)+","+yScaleMarathon(d.Time)+")"; })
+                .on("mouseover", function(d) {
+                  var xPosition = xScaleMarathon(d.Year) ; //+ xScale.bandwidth() / 2;
+                  var yPosition = yScaleMarathon(d.Time) ; //+ 14;
+
+                  //Create the tooltip label
+                  svgMarathon.append("text")
+                    .attr("id", "tooltip")
+                    .attr("x", xPosition)
+                    .attr("y", yPosition)
+                    .attr("text-anchor", "middle")
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", "11px")
+                    .attr("font-weight", "bold")
+                    .attr("fill", "black")
+                    .text(d.Athlete + ": " + d.Year + " on " + d.Time + " minutes");
+
+                })
+                .on("mouseout", function() {
+                    d3.select("#tooltip").remove(); //Remove the tooltip
+                });
+
 
 
             // Setting y label
@@ -684,7 +706,95 @@
               .style("font-weight", "bolder")
               .style("font-size", "13px")
               .text("Year");
+
+            // Setting the title
+            svgMarathon.append("text")
+               .attr("x", wMarathon / 2)
+               .attr("y", paddingMarathon / 2) // we want little bit of padding from the top
+               .attr("text-anchor", "middle")
+               .style("font-size", "19px")
+               .style("font-weight", "bolder")
+               .text("Boston Marathon winning times");
           }
+
+          // Defining the update functions for marathon plot which is called when legend is changed
+          var updateMarathonChart = function(legend) {
+            // getting chosed sub dataset
+            var dataset;
+            if (legend === 'both') {
+              dataset = womenData.concat(menData);
+            } else if (legend === 'men') {
+              dataset = menData;
+            } else if (legend === 'women') {
+              dataset = womenData;
+            } else {
+              console.log("WARNING! THE LEGEND, " + legend + " , IS NOT SUPPORTED");
+            }
+
+            // update the scales
+            xScaleMarathon.domain([d3.min(dataset, function(d) { return d.Year;}) - 5,
+                                    d3.max(dataset, function(d) { return d.Year;}) + 5]); // -5 andd +5 to make little bit spacing
+
+            yScaleMarathon.domain([d3.min(dataset, function(d) { return d.Time;}) - 5,
+                                    d3.max(dataset, function(d) { return d.Time;}) + 5]); // -5 andd +5 to make little bit spacing
+
+
+            // updating the dots (symbols)
+            var dots = svgMarathon.selectAll(".marathon-dots")
+              .data(dataset)
+              .transition()
+              .duration(1000);
+
+            dots.attr("d", symbol.type(function(d){
+                  if(d.Gender === "Man"){
+                    return d3.symbolDiamond
+                  } else {
+                    return d3.symbolCircle
+                }}))
+                .attr('stroke-width', 0.4)
+                .attr("stroke", function(d) {
+                  if(d.Gender === "Man"){ return "red"} else { return "blue"}
+                })
+                .attr("fill", "#00000000")
+                .attr('transform',function(d){ return "translate("+xScaleMarathon(d.Year)+","+yScaleMarathon(d.Time)+")"; });
+
+            // update the line generator according to the new scale
+            line = d3.line()
+                  .x(function(d) { return xScaleMarathon(d.Year); })
+                  .y(function(d) { return yScaleMarathon(d.Time); });
+
+            // to update the lines with the new dataset we have to remove data from the original dataset
+            var lineMenData = menData;
+            var lineWomenData = womenData;
+            if (legend === 'men') {
+              lineWomenData = []; // no women data as we only want to show men data
+            } else if (legend === 'women') {
+              lineMenData = []; // no men data as we only want to show women data
+            }
+
+            // update lines for women and men data
+            svgMarathon.select(".women-line")
+              .datum(lineWomenData)
+              .attr("d", line);
+
+            svgMarathon.select(".men-line")
+              .datum(lineMenData)
+              .attr("d", line);
+
+
+            //Update X axis
+            svgMarathon.select(".xMarathon.axisMarathon")
+                .transition()
+                .duration(1000)
+                .call(xAxisMarathon);
+
+            //Update Y axis
+            svgMarathon.select(".yMarathon.axisMarathon")
+                .transition()
+                .duration(1000)
+                .call(yAxisMarathon);
+          }
+
 
         </script>
     </body>
