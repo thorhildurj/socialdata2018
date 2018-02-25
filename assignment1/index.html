@@ -74,6 +74,12 @@
               border-color: black;
             }
 
+            .part4-chart-container {
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+            }
+
             .chart-option {
               cursor: pointer;
               color: black !important;
@@ -91,6 +97,21 @@
 
             .option-storage-fruit {
               color: #ff9397;
+              list-style-type: square;
+            }
+
+            .option-both {
+              color: purple;
+              list-style-type: square;
+            }
+
+            .option-men {
+              color: red;
+              list-style-type: square;
+            }
+
+            .option-women {
+              color: blue;
               list-style-type: square;
             }
 
@@ -245,8 +266,16 @@
             As a default you see both the winning times for men and women, but you can easily chose to only see men or only women
             by clicking the legends.
           </p>
-          <div id="marathon_graph">
 
+          <div class="part4-chart-container">
+            <div id="marathon_graph">
+
+            </div>
+            <ul>
+              <li onclick="updateChartBar(0)" class="option-both"><span class="chart-option">Both</span></li>
+              <li onclick="updateChartBar(0)" class="option-men"><span class="chart-option">Men</span></li>
+              <li onclick="updateChartBar(2)" class="option-women"><span class="chart-option">Women</span></li>
+            </ul>
           </div>
           <br />
           <br />
@@ -527,8 +556,8 @@
           // other useful variables which we will use later on
           var symbol = d3.symbol()
                          .size(10);
-          var wMarathon = 750; // width of the scatterplot
-          var hMarathon = 500; // height of the scatterplot
+          var wMarathon = 700; // width of the scatterplot
+          var hMarathon = 550; // height of the scatterplot
           var paddingMarathon = 50;
           var xScaleMarathon, yScaleMarathon, xAxisMarathon, yAxisMarathon, svgMarathon;
 
@@ -553,11 +582,13 @@
 
             //Setting the axis
             xScaleMarathon = d3.scaleLinear()
-                           .domain([d3.min(dataset, function(d) { return d.Year;}) - 5, d3.max(dataset, function(d) { return d.Year;}) + 5]) // -5 andd +5 to make little bit spacing
-                           .range([paddingMarathon, wMarathon - paddingMarathon * 2]);
+                           .domain([d3.min(dataset, function(d) { return d.Year;}) - 5,
+                                    d3.max(dataset, function(d) { return d.Year;}) + 5]) // -5 andd +5 to make little bit spacing
+                           .range([paddingMarathon, wMarathon - paddingMarathon]);
 
             yScaleMarathon = d3.scaleLinear()
-                           .domain([d3.min(dataset, function(d) { return d.Time;}) - 5, d3.max(dataset, function(d) { return d.Time;}) + 5]) // -5 andd +5 to make little bit spacing
+                           .domain([d3.min(dataset, function(d) { return d.Time;}) - 5,
+                                    d3.max(dataset, function(d) { return d.Time;}) + 5]) // -5 andd +5 to make little bit spacing
                            .range([hMarathon - paddingMarathon, paddingMarathon]);
 
             //create an empty DOM
@@ -570,7 +601,7 @@
             xAxisMarathon = d3.axisBottom(xScaleMarathon)
                           .ticks(5);
 
-                          //Define Y axis
+            //Define Y axis
             yAxisMarathon = d3.axisLeft()
                           .scale(yScaleMarathon)
                           .ticks(5);
@@ -593,10 +624,15 @@
             	.enter()
             	.append("path");
 
-            dots.attr("d", symbol.type(function(d){if(d.Gender === "Man"){ return d3.symbolDiamond} else{ return d3.symbolCircle}}))
+            dots.attr("d", symbol.type(function(d){
+                  if(d.Gender === "Man"){
+                    return d3.symbolDiamond
+                  } else {
+                    return d3.symbolCircle
+                }}))
               	.attr('stroke-width', 0.4)
                 .attr("stroke", function(d) {
-                  if(d.Gender === "Man"){ return "red"} else{ return "blue"}
+                  if(d.Gender === "Man"){ return "red"} else { return "blue"}
                 })
                 .attr("fill", "#00000000")
               	.attr('transform',function(d){ return "translate("+xScaleMarathon(d.Year)+","+yScaleMarathon(d.Time)+")"; });
