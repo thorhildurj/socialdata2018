@@ -240,6 +240,11 @@
           <br />
           <br />
           <h2 class="part-header" id="part4">Part 4: Viz 2</h2>
+          <p>
+            The following plot graph is recreation of the figur 3-5 in DAOST, but with data from the Boston Marathon winning times.
+            As a default you see both the winning times for men and women, but you can easily chose to only see men or only women
+            by clicking the legends.
+          </p>
           <div id="marathon_graph">
 
           </div>
@@ -394,48 +399,48 @@
                   return getBarFillColor(foodProduceIndexSelected);
                });
 
-               // Define X axis
-               xAxis = d3.axisBottom()
-                   .scale(xScale)
-                   .tickValues(months);
+             // Define X axis
+             xAxis = d3.axisBottom()
+                 .scale(xScale)
+                 .tickValues(months);
 
-               //Define Y axis
-               yAxis = d3.axisLeft()
-                         .scale(yScale)
-                         .ticks(5);
+             //Define Y axis
+             yAxis = d3.axisLeft()
+                       .scale(yScale)
+                       .ticks(5);
 
-               //Create X axis
-               svg.append("g")
-                  .attr("class", "x axis")
-                  .attr("transform", "translate(0," + (h - padding) + ")")
-                  .call(xAxis);
+             //Create X axis
+             svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + (h - padding) + ")")
+                .call(xAxis);
 
-               //Create Y axis
-               svg.append("g")
-                 .attr("class", "y axis")
-                 .attr("transform", "translate(" + padding + ",0)")
-                 .call(yAxis);
+             //Create Y axis
+             svg.append("g")
+               .attr("class", "y axis")
+               .attr("transform", "translate(" + padding + ",0)")
+               .call(yAxis);
 
-               // Setting y label
-               svg.append("text")
-                  .attr("transform", "rotate(-90)")
-                  .attr("y", 0)
-                  .attr("x",0 - (h / 2))
-                  .attr("dy", "1em")
-                  .style("text-anchor", "middle")
-                  .style("font-weight", "bolder")
-                  .style("font-size", "10px")
-                  .text("# of Unique Kinds of Produce");
+             // Setting y label
+             svg.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0)
+                .attr("x",0 - (h / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .style("font-weight", "bolder")
+                .style("font-size", "10px")
+                .text("# of Unique Kinds of Produce");
 
-               // Setting the title
-               svg.append("text")
-                  .attr("x", w / 2)
-                  .attr("y", padding) // we want little bit of padding from the top
-                  .attr("text-anchor", "middle")
-                  .style("font-size", "19px")
-                  .style("font-weight", "bolder")
-                  .text("NYC Green Market - Unique Produce Types");
-          });
+             // Setting the title
+             svg.append("text")
+                .attr("x", w / 2)
+                .attr("y", padding) // we want little bit of padding from the top
+                .attr("text-anchor", "middle")
+                .style("font-size", "19px")
+                .style("font-weight", "bolder")
+                .text("NYC Green Market - Unique Produce Types");
+        });
 
 
           // Defining the update functions which is called when produce type is clicked
@@ -524,7 +529,7 @@
                          .size(10);
           var wMarathon = 750; // width of the scatterplot
           var hMarathon = 500; // height of the scatterplot
-          var paddingMarathon = 30;
+          var paddingMarathon = 50;
           var xScaleMarathon, yScaleMarathon, xAxisMarathon, yAxisMarathon, svgMarathon;
 
           // load the marathon data
@@ -548,12 +553,18 @@
 
             //Setting the axis
             xScaleMarathon = d3.scaleLinear()
-                           .domain([d3.min(dataset, function(d) { return d.Year;}) , d3.max(dataset, function(d) { return d.Year;}) ])
+                           .domain([d3.min(dataset, function(d) { return d.Year;}) - 5, d3.max(dataset, function(d) { return d.Year;}) + 5]) // -5 andd +5 to make little bit spacing
                            .range([paddingMarathon, wMarathon - paddingMarathon * 2]);
 
             yScaleMarathon = d3.scaleLinear()
-                           .domain([d3.min(dataset, function(d) { return d.Time;}) , d3.max(dataset, function(d) { return d.Time;}) ])
+                           .domain([d3.min(dataset, function(d) { return d.Time;}) - 5, d3.max(dataset, function(d) { return d.Time;}) + 5]) // -5 andd +5 to make little bit spacing
                            .range([hMarathon - paddingMarathon, paddingMarathon]);
+
+            //create an empty DOM
+            svgMarathon = d3.select("#marathon_graph")
+                            .append("svg")
+                            .attr("width", wMarathon)
+                            .attr("height", hMarathon);
 
             //creating the axis thing
             xAxisMarathon = d3.axisBottom(xScaleMarathon)
@@ -564,13 +575,19 @@
                           .scale(yScaleMarathon)
                           .ticks(5);
 
-            //create an empty DOM
-            svgMarathon = d3.select("#marathon_graph")
-                            .append("svg")
-                            .attr("width", wMarathon)
-                            .attr("height", hMarathon);
+            //Create X axis
+            svgMarathon.append("g")
+               .attr("class", "x axis")
+               .attr("transform", "translate(0," + (hMarathon - paddingMarathon) + ")")
+               .call(xAxisMarathon);
 
+            //Create Y axis
+            svgMarathon.append("g")
+              .attr("class", "y axis")
+              .attr("transform", "translate(" + paddingMarathon + ",0)")
+              .call(yAxisMarathon);
 
+            // creating the dots (the symbols)
             var dots = svgMarathon.selectAll(".dots")
             	.data(dataset)
             	.enter()
@@ -585,6 +602,26 @@
               	.attr('transform',function(d){ return "translate("+xScaleMarathon(d.Year)+","+yScaleMarathon(d.Time)+")"; });
 
 
+            // Setting y label
+            svgMarathon.append("text")
+               .attr("transform", "rotate(-90)")
+               .attr("y", 0)
+               .attr("x",0 - (hMarathon / 2))
+               .attr("dy", "1em")
+               .style("text-anchor", "middle")
+               .style("font-weight", "bolder")
+               .style("font-size", "13px")
+               .text("Minutes");
+
+           // Setting x label
+           svgMarathon.append("text")
+              .attr("y", hMarathon - 25)
+              .attr("x", (wMarathon / 2))
+              .attr("dy", "1em")
+              .style("text-anchor", "middle")
+              .style("font-weight", "bolder")
+              .style("font-size", "13px")
+              .text("Year");
           }
 
         </script>
