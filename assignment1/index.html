@@ -121,6 +121,13 @@
                 margin-right: 2px;
             }
 
+            .part1-question_text li {
+              color: gray;
+              font-style: italic;
+              margin-bottom: -18px;
+              margin-top: 45px;
+            }
+
         </style>
     </head>
     <body>
@@ -137,13 +144,35 @@
             <li class="scroll-nav" id="scroll4">Part4</li>
           </ol>
 
-          <!-- ########################  PART 1  ####################### -->
+<!-- ########################  PART 1  ####################### -->
           <br />
           <br />
           <h2 class="part-header" id="part1">Part 1: DAOST Chapter 2 Questions</h2>
-          <p>
-            ...
-          </p>
+
+          <ul class="part1-question_text">
+            <li>Explain in your own words the point of the jitter plot.</li>
+              <p>The point of a jitter plot is to get a better idea of the frequency of data points in
+                a dot plot.
+                E.g. you have a dot plot and many data points have the same value, therefore
+                they are drawn onto the same point. When making a small jitter to each data point you can
+                better see how the data is distributed.<br/>
+
+              </p>
+
+            <li>Explain in your own words the point of figure 2-3.</li>
+              <img src="image23.png" alt="Image 2-3" style="width:210px;" align="right">
+              <p>In figure 2.3. the author is explaining the importance of choosing the right bin alignment
+                and pointing out that for the same data it clearly matters how you choose the bin alignment
+                as it changes the visualisation and interpretation of the data (you can tweek the bin alignment
+                for a half a bin width in both directions as is shown in image 2-3). Because of this, histograms
+                can be sometimes indefinite. Also they can sometimes be a poor method to determine distribution’s shape as
+                they are really affected by the number of used bins. <i style="font-size: 12px;">(Image 2.3. from Data Analysis with Open Source Tools by Philipp K. Janert).</i> </p>
+
+            <li>The author of DAOST (Philipp Janert) likes KDEs (and think they're better than histograms). And I don't. When can KDEs be misleading?</li>
+              <p>When you want to know exactly the amount of certain points(or points within a bin) you can’t see what the right amount is.
+                It is harder to get a specific information from the KDE plots then from histograms</p>
+
+            </ul>
 
 
           <!-- ########################  PART 2  ####################### -->
