@@ -153,6 +153,8 @@
     </head>
     <body>
         <div class="body-content">
+          <br />
+          <br />
           <h1 class="assignment-header">Assignment 1</h1>
 
           <p>
@@ -739,11 +741,16 @@
                                     d3.max(dataset, function(d) { return d.Time;}) + 5]); // -5 andd +5 to make little bit spacing
 
 
-            // updating the dots (symbols)
-            var dots = svgMarathon.selectAll(".marathon-dots")
-              .data(dataset)
-              .transition()
-              .duration(1000);
+            // remove the old dots (the symbols)
+            svgMarathon.selectAll(".marathon-dots")
+                       .remove();
+
+
+            // creating the dots (the symbols) with the new dataset
+            var dots = svgMarathon.selectAll(".dots")
+            	.data(dataset)
+            	.enter()
+            	.append("path");
 
             dots.attr("d", symbol.type(function(d){
                   if(d.Gender === "Man"){
@@ -751,12 +758,54 @@
                   } else {
                     return d3.symbolCircle
                 }}))
-                .attr('stroke-width', 0.4)
+              	.attr('stroke-width', 0.4)
                 .attr("stroke", function(d) {
                   if(d.Gender === "Man"){ return "red"} else { return "blue"}
                 })
                 .attr("fill", "#00000000")
-                .attr('transform',function(d){ return "translate("+xScaleMarathon(d.Year)+","+yScaleMarathon(d.Time)+")"; });
+                .attr("class", "marathon-dots")
+              	.attr('transform',function(d){ return "translate("+xScaleMarathon(d.Year)+","+yScaleMarathon(d.Time)+")"; })
+                .on("mouseover", function(d) {
+                  var xPosition = xScaleMarathon(d.Year) ; //+ xScale.bandwidth() / 2;
+                  var yPosition = yScaleMarathon(d.Time) ; //+ 14;
+
+                  //Create the tooltip label
+                  svgMarathon.append("text")
+                    .attr("id", "tooltip")
+                    .attr("x", xPosition)
+                    .attr("y", yPosition)
+                    .attr("text-anchor", "middle")
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", "11px")
+                    .attr("font-weight", "bold")
+                    .attr("fill", "black")
+                    .text(d.Athlete + ": " + d.Year + " on " + d.Time + " minutes");
+
+                })
+                .on("mouseout", function() {
+                    d3.select("#tooltip").remove(); //Remove the tooltip
+                });
+
+
+//            // updating the dots (symbols)
+//            var dots = svgMarathon.selectAll(".marathon-dots")
+//              .data(dataset)
+//              .transition()
+//              .duration(1000);
+//
+//
+//            dots.attr("d", symbol.type(function(d){
+//                  if(d.Gender === "Man"){
+//                    return d3.symbolDiamond
+//                  } else {
+//                    return d3.symbolCircle
+//                }}))
+//                .attr('stroke-width', 0.4)
+//                .attr("stroke", function(d) {
+//                  if(d.Gender === "Man"){ return "red"} else { return "blue"}
+//                })
+//                .attr("fill", "#00000000")
+//                .attr('transform',function(d){ return "translate("+xScaleMarathon(d.Year)+","+yScaleMarathon(d.Time)+")"; });
 
             // update the line generator according to the new scale
             line = d3.line()
