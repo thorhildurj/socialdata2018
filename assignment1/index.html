@@ -622,6 +622,16 @@
                 .style("font-size", "10px")
                 .text("# of Unique Kinds of Produce");
 
+            // Setting x label
+            svg.append("text")
+               .attr("y", h - 15)
+               .attr("x", (w / 2))
+               .attr("dy", "1em")
+               .style("text-anchor", "middle")
+               .style("font-weight", "bolder")
+               .style("font-size", "10px")
+               .text("Months");
+
              // Setting the title
              svg.append("text")
                 .attr("x", w / 2)
@@ -876,7 +886,34 @@
                .style("font-size", "19px")
                .style("font-weight", "bolder")
                .text("Boston Marathon winning times");
+
+            // set the best line for women
+            var trendlineWomen = svgMarathon.selectAll(".trendline").data([[]]);
+            trendlineWomen.enter()
+              .append("line")
+              .attr("class", "women-trendline")
+              .attr("x1", function(d) { return xScaleMarathon(1966); })
+              .attr("y1", function(d) { return yScaleMarathon(179.1138); })
+              .attr("x2", function(d) { return xScaleMarathon(2017); })
+              .attr("y2", function(d) { return yScaleMarathon(131.3931); })
+              .attr("stroke", "blue")
+              .attr("stroke-dasharray", "5")
+              .attr("stroke-width", 1);
+
+            // set the best line for men
+            var trendlineMen = svgMarathon.selectAll(".trendline").data([[]]);
+            trendlineMen.enter()
+              .append("line")
+              .attr("class", "men-trendline")
+              .attr("x1", function(d) { return xScaleMarathon(1897); })
+              .attr("y1", function(d) { return yScaleMarathon(158.8212); })
+              .attr("x2", function(d) { return xScaleMarathon(2017); })
+              .attr("y2", function(d) { return yScaleMarathon(123.9732); })
+              .attr("stroke", "red")
+              .attr("stroke-dasharray", "5")
+              .attr("stroke-width", 1);
           }
+
 
           // Defining the update functions for marathon plot which is called when legend is changed
           var updateMarathonChart = function(legend) {
@@ -903,7 +940,6 @@
             // remove the old dots (the symbols)
             svgMarathon.selectAll(".marathon-dots")
                        .remove();
-
 
             // creating the dots (the symbols) with the new dataset
             var dots = svgMarathon.selectAll(".dots")
@@ -945,27 +981,6 @@
                     d3.select("#tooltip").remove(); //Remove the tooltip
                 });
 
-
-//            // updating the dots (symbols)
-//            var dots = svgMarathon.selectAll(".marathon-dots")
-//              .data(dataset)
-//              .transition()
-//              .duration(1000);
-//
-//
-//            dots.attr("d", symbol.type(function(d){
-//                  if(d.Gender === "Man"){
-//                    return d3.symbolDiamond
-//                  } else {
-//                    return d3.symbolCircle
-//                }}))
-//                .attr('stroke-width', 0.4)
-//                .attr("stroke", function(d) {
-//                  if(d.Gender === "Man"){ return "red"} else { return "blue"}
-//                })
-//                .attr("fill", "#00000000")
-//                .attr('transform',function(d){ return "translate("+xScaleMarathon(d.Year)+","+yScaleMarathon(d.Time)+")"; });
-
             // update the line generator according to the new scale
             line = d3.line()
                   .x(function(d) { return xScaleMarathon(d.Year); })
@@ -1001,8 +1016,43 @@
                 .transition()
                 .duration(1000)
                 .call(yAxisMarathon);
-          }
 
+            // remove the old trendline
+            svgMarathon.selectAll(".men-trendline")
+                       .remove();
+            svgMarathon.selectAll(".women-trendline")
+                       .remove();
+
+            // set the best line for women
+            if (legend === 'both' || legend === 'women') {
+              var trendlineWomen = svgMarathon.selectAll(".trendline").data([[]]);
+              trendlineWomen.enter()
+                .append("line")
+                .attr("class", "women-trendline")
+                .attr("x1", function(d) { return xScaleMarathon(1966); })
+                .attr("y1", function(d) { return yScaleMarathon(179.1138); })
+                .attr("x2", function(d) { return xScaleMarathon(2017); })
+                .attr("y2", function(d) { return yScaleMarathon(131.3931); })
+                .attr("stroke", "blue")
+                .attr("stroke-dasharray", "5")
+                .attr("stroke-width", 1);
+            }
+
+            if (legend === 'both' || legend === 'men') {
+              // set the best line for men
+              var trendlineMen = svgMarathon.selectAll(".trendline").data([[]]);
+              trendlineMen.enter()
+                .append("line")
+                .attr("class", "men-trendline")
+                .attr("x1", function(d) { return xScaleMarathon(1897); })
+                .attr("y1", function(d) { return yScaleMarathon(158.8212); })
+                .attr("x2", function(d) { return xScaleMarathon(2017); })
+                .attr("y2", function(d) { return yScaleMarathon(123.9732); })
+                .attr("stroke", "red")
+                .attr("stroke-dasharray", "5")
+                .attr("stroke-width", 1);
+            }
+          }
 
         </script>
     </body>
