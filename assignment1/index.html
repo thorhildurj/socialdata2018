@@ -560,6 +560,7 @@
           var hMarathon = 550; // height of the scatterplot
           var paddingMarathon = 50;
           var xScaleMarathon, yScaleMarathon, xAxisMarathon, yAxisMarathon, svgMarathon;
+          var line;
 
           // load the marathon data
           d3.csv("marathon_men.csv", marathonRowConverterMen, function(data) {
@@ -617,6 +618,31 @@
               .attr("class", "y axis")
               .attr("transform", "translate(" + paddingMarathon + ",0)")
               .call(yAxisMarathon);
+
+            //Define line generator
+    				line = d3.line()
+    							.x(function(d) { return xScaleMarathon(d.Year); })
+    							.y(function(d) { return yScaleMarathon(d.Time); });
+
+            //Create line for womanData
+            svgMarathon.append("path")
+              .datum(womenData)
+              .attr("class", "line")
+              .attr("d", line)
+              .attr("fill", "none")
+              .attr("stroke", "black")
+              .attr("stroke-dasharray", "2");
+
+
+            //Create line for menData
+            svgMarathon.append("path")
+              .datum(menData)
+              .attr("class", "line")
+              .attr("d", line)
+              .attr("fill", "none")
+              .attr("stroke", "black")
+              .attr("stroke-dasharray", "2");
+
 
             // creating the dots (the symbols)
             var dots = svgMarathon.selectAll(".dots")
