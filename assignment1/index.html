@@ -261,25 +261,21 @@
           ***********************************/
 
           document.getElementById("scroll1").onclick = function() {
-            console.log("clicking");
             var elmnt = document.getElementById("part1");
             elmnt.scrollIntoView();
           };
 
           document.getElementById("scroll2").onclick = function() {
-            console.log("clicking");
             var elmnt = document.getElementById("part2");
             elmnt.scrollIntoView();
           };
 
           document.getElementById("scroll3").onclick = function() {
-            console.log("clicking");
             var elmnt = document.getElementById("part3");
             elmnt.scrollIntoView();
           };
 
           document.getElementById("scroll4").onclick = function() {
-            console.log("clicking");
             var elmnt = document.getElementById("part4");
             elmnt.scrollIntoView();
           };
@@ -489,8 +485,8 @@
           ********** PART 4 ***********
           *****************************/
 
-          // convert to get our data
-          var marathonRowConverter = function(d) {
+          // converter for our men data
+          var marathonRowConverterMen = function(d) {
             var hours = parseInt(d.Time.substring(0,1));
             var minutes = parseInt(d.Time.substring(2,4));
             var totalMinutes = hours * 60 + minutes;
@@ -500,7 +496,21 @@
               CountryState: d.CountryState,
               Time: totalMinutes,
               Notes: d.Notes,
-              Foo: "Baaar",
+              Gender: "Man",
+            };
+          }
+          // converter for our women data
+          var marathonRowConverterWomen = function(d) {
+            var hours = parseInt(d.Time.substring(0,1));
+            var minutes = parseInt(d.Time.substring(2,4));
+            var totalMinutes = hours * 60 + minutes;
+            return {
+              Year: parseInt(d.Year),
+              Athlete: d.Athlete,
+              CountryState: d.CountryState,
+              Time: totalMinutes,
+              Notes: d.Notes,
+              Gender: "Woman",
             };
           }
 
@@ -510,19 +520,20 @@
           var marathonDataset = null; // the selected (visible) dataset (men or women or both)
 
           // other useful variables which we will use later on
-          var symbol = d3.symbol();
-          var wMarathon = 500; // width of the scatterplot
-          var hMarathon = 300; // height of the scatterplot
+          var symbol = d3.symbol()
+                         .size(10);
+          var wMarathon = 750; // width of the scatterplot
+          var hMarathon = 500; // height of the scatterplot
           var paddingMarathon = 30;
           var xScaleMarathon, yScaleMarathon, xAxisMarathon, yAxisMarathon, svgMarathon;
 
           // load the marathon data
-          d3.csv("marathon_men.csv", marathonRowConverter, function(data) {
+          d3.csv("marathon_men.csv", marathonRowConverterMen, function(data) {
             menData = data;
             onMarathonDataLoaded();
           });
 
-          d3.csv("marathon_women.csv", marathonRowConverter, function(data) {
+          d3.csv("marathon_women.csv", marathonRowConverterWomen, function(data) {
             womenData = data;
             onMarathonDataLoaded();
           });
@@ -531,8 +542,6 @@
           var onMarathonDataLoaded = function() {
             // first we check if all the data has been loaded, if not, we return
             if (!menData ||! womenData) return;
-
-            console.log("menData", menData);
 
             // our default selected dataset are both men and women
             var dataset = womenData.concat(menData);
@@ -567,8 +576,12 @@
             	.enter()
             	.append("path");
 
-            dots.attr("d", symbol.type(function(d){if(d.Year > 1990){ return d3.symbolCross} else{ return d3.symbolDiamond}}))
-              	.attr('stroke-width',1)
+            dots.attr("d", symbol.type(function(d){if(d.Gender === "Man"){ return d3.symbolDiamond} else{ return d3.symbolCircle}}))
+              	.attr('stroke-width', 0.4)
+                .attr("stroke", function(d) {
+                  if(d.Gender === "Man"){ return "red"} else{ return "blue"}
+                })
+                .attr("fill", "#00000000")
               	.attr('transform',function(d){ return "translate("+xScaleMarathon(d.Year)+","+yScaleMarathon(d.Time)+")"; });
 
 
