@@ -176,7 +176,6 @@
               </p>
 
             <li>Question 2</li>
-              <img src="image23.png" alt="Image 2-3" style="width:210px;" align="right">
               <p>
                 Answer 2 <i style="font-size: 12px;">(Image 2.3. from Data Analysis with Open Source Tools by Philipp K. Janert).</i> </p>
             </ul>
@@ -186,11 +185,9 @@
           <br />
           <br />
           <h2 class="part-header" id="part2">Part 2: Visualizing Murders over Time</h2>
-          <ul class="part1-question_text">
+          <div id="part2-map">
 
-
-
-          </ul>
+          </div>
 
 
           <br />
@@ -219,65 +216,42 @@
             elmnt.scrollIntoView();
           };
 
-          document.getElementById("scroll3").onclick = function() {
-            var elmnt = document.getElementById("part3");
-            elmnt.scrollIntoView();
-          };
-
-          document.getElementById("scroll4").onclick = function() {
-            var elmnt = document.getElementById("part4");
-            elmnt.scrollIntoView();
-          };
-
-
 
           /****************************
-          ********** PART 3 ***********
+          ********** PART 2 ***********
           *****************************/
 
+          var w = 600;
+          var h = 600;
 
-          // Lets start creating some helper functions
-          var getBarFillColor = function (foodProduceIndexSelected) {
+          //Create SVG element
+          svg = d3.select("#part2-map")
+                  .append("svg")
+                  .attr("width", w)
+                  .attr("height", h);
 
-            if (foodProduceIndexSelected === 0) {
-              return "#ff2419";
-            } else if (foodProduceIndexSelected === 2) {
-              return "#018215";
-            } else if (foodProduceIndexSelected === 1) {
-              return "#ff9397";
-            } else if (foodProduceIndexSelected === 3) {
-              return "#dae4c3";
-            }
-          }
+          //Define path generator, using the Albers USA projection
+          // geoMercator()
+          // geoAlbersUsa()
+          var projection = d3.geoMercator()
+                             .translate([w/0.013665, h/0.02255])
+                             .scale([33800]);
 
-          var getSubDataset = function (datasetWithAllTypes, foodProduceIndex) {
-            var dataset = [];
-            for (var i = 0; i < datasetWithAllTypes.length; i++) {
-              var entry = datasetWithAllTypes[i];
-              if (entry.Index === foodProduceIndex) {
-                dataset.push(entry)
-              }
-            }
-
-            return dataset;
-          }
-
-          function make_y_axis(scale, svg) {
-            return d3.axisLeft()
-                      .scale(scale)
-                      .ticks(5);
-          }
+          var path = d3.geoPath().projection(projection);
 
 
 
-          // Next we declare some usefule variables
-          var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-          var w = 480;
-          var h = 350;
-          var datasetWithAllTypes; // the whole dataset with all the sub datasets i.e. fresh fruit, ...
-          var foodProduceIndexSelected = 0; // we always picked fresh fruit sub dataset as default
-          var xScale, yScale, svg, xAxis, yAxis;
-          var padding = 40;
+          //Load in GeoJSON data
+          d3.json("boroughs.geojson", function(json) {
+            //Bind data and create one path per GeoJSON feature
+            console.log("json", json)
+            svg.selectAll("path")
+               .data(json.features)
+               .enter()
+               .append("path")
+               .attr("d", path)
+               .style("fill", "steelblue");
+          });
 
           var rowConverter = function(d) {
             return {
@@ -288,525 +262,12 @@
           }
 
           // we load the data and display the bar chart
-          d3.csv("green_market.csv", rowConverter, function(data) {
-
-            // pick correct dataset
-            datasetWithAllTypes = data;
-            var dataset = getSubDataset(datasetWithAllTypes, foodProduceIndexSelected);
-
-            // lets create the scales
-            xScale = d3.scaleBand()
-              .domain(months)
-              .rangeRound([padding, w])  // 'rangeRound' enables rounding
-              .paddingInner(0.6);
-
-            yScale = d3.scaleLinear()
-              .domain([0, d3.max(dataset, function(d) { return d.Count; })])
-              .range([h - padding, padding * 2]); // double padding on the top to have room for title
-
-            //Create SVG element
-            svg = d3.select("#part3-chart")
-                    .append("svg")
-                    .attr("width", w)
-                    .attr("height", h);
-
-            // Setting chart lines (really long ticks)
-            svg.append("g")
-               .style("stroke", "#25b898")
-               .style("color", "#25b898")
-               .attr("class", "grid")
-               .call(make_y_axis(yScale, svg)
-                      .tickSize(-w, 0, 0)
-                      .tickFormat("")
-               )
-               .attr("transform", "translate(" + padding + ",0)")
-               .style("stroke", "#25b898")
-               .style("color", "#25b898")
-               ;
-
-            //Create bars
-            svg.selectAll("rect")
-               .data(dataset)
-               .enter()
-               .append("rect")
-               .attr("x", function(d, i) {
-                  return xScale(d.Month);  // Setting x values
-               })
-               .attr("y", function(d) {
-                  return yScale(d.Count);
-               })
-               .attr("width", xScale.bandwidth())
-               .attr("height", function(d) {
-                  return h - yScale(d.Count) - padding;
-               })
-               .attr("fill", function(d) {
-                  return getBarFillColor(foodProduceIndexSelected);
-               });
-
-             // Define X axis
-             xAxis = d3.axisBottom()
-                 .scale(xScale)
-                 .tickValues(months);
-
-             //Define Y axis
-             yAxis = d3.axisLeft()
-                       .scale(yScale)
-                       .ticks(5);
-
-             //Create X axis
-             svg.append("g")
-                .attr("class", "x axis")
-                .attr("transform", "translate(0," + (h - padding) + ")")
-                .call(xAxis);
-
-             //Create Y axis
-             svg.append("g")
-               .attr("class", "y axis")
-               .attr("transform", "translate(" + padding + ",0)")
-               .call(yAxis);
-
-             // Setting y label
-             svg.append("text")
-                .attr("transform", "rotate(-90)")
-                .attr("y", 0)
-                .attr("x",0 - (h / 2))
-                .attr("dy", "1em")
-                .style("text-anchor", "middle")
-                .style("font-weight", "bolder")
-                .style("font-size", "10px")
-                .text("# of Unique Kinds of Produce");
-
-            // Setting x label
-            svg.append("text")
-               .attr("y", h - 15)
-               .attr("x", (w / 2))
-               .attr("dy", "1em")
-               .style("text-anchor", "middle")
-               .style("font-weight", "bolder")
-               .style("font-size", "10px")
-               .text("Months");
-
-             // Setting the title
-             svg.append("text")
-                .attr("x", w / 2)
-                .attr("y", padding) // we want little bit of padding from the top
-                .attr("text-anchor", "middle")
-                .style("font-size", "19px")
-                .style("font-weight", "bolder")
-                .text("NYC Green Market - Unique Produce Types");
-        });
+          d3.csv("all_murder.csv", function(data) {
 
 
-          // Defining the update functions which is called when produce type is clicked
-          var updateChartBar = function(foodProduceIndexSelected) {
-            // getting chosed sub dataset
-            var dataset = getSubDataset(datasetWithAllTypes, foodProduceIndexSelected);
-
-            // update y scale and y axis (we don't need to update x scale and axis, it is always the same)
-            yScale.domain([0, d3.max(dataset, function(d) { return d.Count; })]);
-
-
-            // updating all bars
-            svg.selectAll("rect")
-               .data(dataset)
-               .transition()
-               .duration(1000)
-               .attr("x", function(d, i) {
-                  return xScale(d.Month);  // Setting x values
-               })
-               .attr("y", function(d) {
-                  return yScale(d.Count);
-               })
-               .attr("width", xScale.bandwidth())
-               .attr("height", function(d) {
-                  return h - yScale(d.Count) - padding;
-               })
-               .attr("fill", function(d) {
-                   return getBarFillColor(foodProduceIndexSelected);
-               });
-
-
-            //Update X axis
-   					svg.select(".x.axis")
-   				    	.transition()
-   				    	.duration(1000)
-   						  .call(xAxis);
-
-   					//Update Y axis
-   					svg.select(".y.axis")
-   				    	.transition()
-   				    	.duration(1000)
-   						  .call(yAxis);
-          }
-
-
-          /****************************
-          ********** PART 4 ***********
-          *****************************/
-
-          // converter for our men data
-          var marathonRowConverterMen = function(d) {
-            var hours = parseInt(d.Time.substring(0,1));
-            var minutes = parseInt(d.Time.substring(2,4));
-            var totalMinutes = hours * 60 + minutes;
-            return {
-              Year: parseInt(d.Year),
-              Athlete: d.Athlete,
-              CountryState: d.CountryState,
-              Time: totalMinutes,
-              Notes: d.Notes,
-              Gender: "Man",
-            };
-          }
-          // converter for our women data
-          var marathonRowConverterWomen = function(d) {
-            var hours = parseInt(d.Time.substring(0,1));
-            var minutes = parseInt(d.Time.substring(2,4));
-            var totalMinutes = hours * 60 + minutes;
-            return {
-              Year: parseInt(d.Year),
-              Athlete: d.Athlete,
-              CountryState: d.CountryState,
-              Time: totalMinutes,
-              Notes: d.Notes,
-              Gender: "Woman",
-            };
-          }
-
-          // variables to store our data
-          var menData = null; // the men dataset
-          var womenData = null; // the women dataset
-          var marathonDataset = null; // the selected (visible) dataset (men or women or both)
-
-          // other useful variables which we will use later on
-          var symbol = d3.symbol()
-                         .size(10);
-          var wMarathon = 700; // width of the scatterplot
-          var hMarathon = 550; // height of the scatterplot
-          var paddingMarathon = 50;
-          var xScaleMarathon, yScaleMarathon, xAxisMarathon, yAxisMarathon, svgMarathon, line;
-
-          // load the marathon data
-          d3.csv("marathon_men.csv", marathonRowConverterMen, function(data) {
-            menData = data;
-            onMarathonDataLoaded();
           });
 
-          d3.csv("marathon_women.csv", marathonRowConverterWomen, function(data) {
-            womenData = data;
-            onMarathonDataLoaded();
-          });
 
-          // the function that is called when all data is loaded
-          var onMarathonDataLoaded = function() {
-            // first we check if all the data has been loaded, if not, we return
-            if (!menData ||! womenData) return;
-
-            // our default selected dataset are both men and women
-            var dataset = womenData.concat(menData);
-
-            //Setting the scales
-            xScaleMarathon = d3.scaleLinear()
-                           .domain([d3.min(dataset, function(d) { return d.Year;}) - 5,
-                                    d3.max(dataset, function(d) { return d.Year;}) + 5]) // -5 andd +5 to make little bit spacing
-                           .range([paddingMarathon, wMarathon - paddingMarathon]);
-
-            yScaleMarathon = d3.scaleLinear()
-                           .domain([d3.min(dataset, function(d) { return d.Time;}) - 5,
-                                    d3.max(dataset, function(d) { return d.Time;}) + 5]) // -5 andd +5 to make little bit spacing
-                           .range([hMarathon - paddingMarathon, paddingMarathon]);
-
-            //create an empty DOM
-            svgMarathon = d3.select("#marathon_graph")
-                            .append("svg")
-                            .attr("width", wMarathon)
-                            .attr("height", hMarathon);
-
-            //creating the axis thing
-            xAxisMarathon = d3.axisBottom(xScaleMarathon)
-                          .ticks(5);
-
-            //Define Y axis
-            yAxisMarathon = d3.axisLeft()
-                          .scale(yScaleMarathon)
-                          .ticks(5);
-
-            //Create X axis
-            svgMarathon.append("g")
-               .attr("class", "xMarathon axisMarathon")
-               .attr("transform", "translate(0," + (hMarathon - paddingMarathon) + ")")
-               .call(xAxisMarathon);
-
-            //Create Y axis
-            svgMarathon.append("g")
-              .attr("class", "yMarathon axisMarathon")
-              .attr("transform", "translate(" + paddingMarathon + ",0)")
-              .call(yAxisMarathon);
-
-            //Define line generator
-    				line = d3.line()
-    							.x(function(d) { return xScaleMarathon(d.Year); })
-    							.y(function(d) { return yScaleMarathon(d.Time); });
-
-            //Create line for womanData
-            svgMarathon.append("path")
-              .datum(womenData)
-              .attr("class", "line women-line")
-              .attr("d", line)
-              .attr("fill", "none")
-              .attr("stroke", "black")
-              .attr("stroke-dasharray", "2");
-
-
-            //Create line for menData
-            svgMarathon.append("path")
-              .datum(menData)
-              .attr("class", "line men-line")
-              .attr("d", line)
-              .attr("fill", "none")
-              .attr("stroke", "black")
-              .attr("stroke-dasharray", "2");
-
-
-            // creating the dots (the symbols)
-            var dots = svgMarathon.selectAll(".dots")
-            	.data(dataset)
-            	.enter()
-            	.append("path");
-
-            dots.attr("d", symbol.type(function(d){
-                  if(d.Gender === "Man"){
-                    return d3.symbolDiamond
-                  } else {
-                    return d3.symbolCircle
-                }}))
-              	.attr('stroke-width', 0.4)
-                .attr("stroke", function(d) {
-                  if(d.Gender === "Man"){ return "red"} else { return "blue"}
-                })
-                .attr("fill", "#00000000")
-
-                .attr("class", "marathon-dots")
-              	.attr('transform',function(d){ return "translate("+xScaleMarathon(d.Year)+","+yScaleMarathon(d.Time)+")"; })
-                .on("mouseover", function(d) {
-                  var xPosition = xScaleMarathon(d.Year) ; //+ xScale.bandwidth() / 2;
-                  var yPosition = yScaleMarathon(d.Time) ; //+ 14;
-
-                  //Create the tooltip label
-                  svgMarathon.append("text")
-                    .attr("id", "tooltip")
-                    .attr("x", xPosition)
-                    .attr("y", yPosition)
-                    .attr("text-anchor", "middle")
-                    .attr("font-family", "sans-serif")
-                    .attr("font-size", "11px")
-                    .attr("font-weight", "bold")
-                    .attr("fill", "black")
-                    .text(d.Athlete + ": " + d.Year + " on " + d.Time + " minutes");
-
-                })
-                .on("mouseout", function() {
-                    d3.select("#tooltip").remove(); //Remove the tooltip
-                });
-
-
-
-            // Setting y label
-            svgMarathon.append("text")
-               .attr("transform", "rotate(-90)")
-               .attr("y", 0)
-               .attr("x",0 - (hMarathon / 2))
-               .attr("dy", "1em")
-               .style("text-anchor", "middle")
-               .style("font-weight", "bolder")
-               .style("font-size", "13px")
-               .text("Minutes");
-
-           // Setting x label
-           svgMarathon.append("text")
-              .attr("y", hMarathon - 25)
-              .attr("x", (wMarathon / 2))
-              .attr("dy", "1em")
-              .style("text-anchor", "middle")
-              .style("font-weight", "bolder")
-              .style("font-size", "13px")
-              .text("Year");
-
-            // Setting the title
-            svgMarathon.append("text")
-               .attr("x", wMarathon / 2)
-               .attr("y", paddingMarathon / 2) // we want little bit of padding from the top
-               .attr("text-anchor", "middle")
-               .style("font-size", "19px")
-               .style("font-weight", "bolder")
-               .text("Boston Marathon winning times");
-
-            // set the best line for women
-            var trendlineWomen = svgMarathon.selectAll(".trendline").data([[]]);
-            trendlineWomen.enter()
-              .append("line")
-              .attr("class", "women-trendline")
-              .attr("x1", function(d) { return xScaleMarathon(1966); })
-              .attr("y1", function(d) { return yScaleMarathon(179.1138); })
-              .attr("x2", function(d) { return xScaleMarathon(2017); })
-              .attr("y2", function(d) { return yScaleMarathon(131.3931); })
-              .attr("stroke", "blue")
-              .attr("stroke-dasharray", "5")
-              .attr("stroke-width", 1);
-
-            // set the best line for men
-            var trendlineMen = svgMarathon.selectAll(".trendline").data([[]]);
-            trendlineMen.enter()
-              .append("line")
-              .attr("class", "men-trendline")
-              .attr("x1", function(d) { return xScaleMarathon(1897); })
-              .attr("y1", function(d) { return yScaleMarathon(158.8212); })
-              .attr("x2", function(d) { return xScaleMarathon(2017); })
-              .attr("y2", function(d) { return yScaleMarathon(123.9732); })
-              .attr("stroke", "red")
-              .attr("stroke-dasharray", "5")
-              .attr("stroke-width", 1);
-          }
-
-
-          // Defining the update functions for marathon plot which is called when legend is changed
-          var updateMarathonChart = function(legend) {
-            // getting chosed sub dataset
-            var dataset;
-            if (legend === 'both') {
-              dataset = womenData.concat(menData);
-            } else if (legend === 'men') {
-              dataset = menData;
-            } else if (legend === 'women') {
-              dataset = womenData;
-            } else {
-              console.log("WARNING! THE LEGEND, " + legend + " , IS NOT SUPPORTED");
-            }
-
-            // update the scales
-            xScaleMarathon.domain([d3.min(dataset, function(d) { return d.Year;}) - 5,
-                                    d3.max(dataset, function(d) { return d.Year;}) + 5]); // -5 andd +5 to make little bit spacing
-
-            yScaleMarathon.domain([d3.min(dataset, function(d) { return d.Time;}) - 5,
-                                    d3.max(dataset, function(d) { return d.Time;}) + 5]); // -5 andd +5 to make little bit spacing
-
-
-            // remove the old dots (the symbols)
-            svgMarathon.selectAll(".marathon-dots")
-                       .remove();
-
-            // creating the dots (the symbols) with the new dataset
-            var dots = svgMarathon.selectAll(".dots")
-            	.data(dataset)
-            	.enter()
-            	.append("path");
-
-            dots.attr("d", symbol.type(function(d){
-                  if(d.Gender === "Man"){
-                    return d3.symbolDiamond
-                  } else {
-                    return d3.symbolCircle
-                }}))
-              	.attr('stroke-width', 0.4)
-                .attr("stroke", function(d) {
-                  if(d.Gender === "Man"){ return "red"} else { return "blue"}
-                })
-                .attr("fill", "#00000000")
-                .attr("class", "marathon-dots")
-              	.attr('transform',function(d){ return "translate("+xScaleMarathon(d.Year)+","+yScaleMarathon(d.Time)+")"; })
-                .on("mouseover", function(d) {
-                  var xPosition = xScaleMarathon(d.Year) ; //+ xScale.bandwidth() / 2;
-                  var yPosition = yScaleMarathon(d.Time) ; //+ 14;
-
-                  //Create the tooltip label
-                  svgMarathon.append("text")
-                    .attr("id", "tooltip")
-                    .attr("x", xPosition)
-                    .attr("y", yPosition)
-                    .attr("text-anchor", "middle")
-                    .attr("font-family", "sans-serif")
-                    .attr("font-size", "11px")
-                    .attr("font-weight", "bold")
-                    .attr("fill", "black")
-                    .text(d.Athlete + ": " + d.Year + " on " + d.Time + " minutes");
-
-                })
-                .on("mouseout", function() {
-                    d3.select("#tooltip").remove(); //Remove the tooltip
-                });
-
-            // update the line generator according to the new scale
-            line = d3.line()
-                  .x(function(d) { return xScaleMarathon(d.Year); })
-                  .y(function(d) { return yScaleMarathon(d.Time); });
-
-            // to update the lines with the new dataset we have to remove data from the original dataset
-            var lineMenData = menData;
-            var lineWomenData = womenData;
-            if (legend === 'men') {
-              lineWomenData = []; // no women data as we only want to show men data
-            } else if (legend === 'women') {
-              lineMenData = []; // no men data as we only want to show women data
-            }
-
-            // update lines for women and men data
-            svgMarathon.select(".women-line")
-              .datum(lineWomenData)
-              .attr("d", line);
-
-            svgMarathon.select(".men-line")
-              .datum(lineMenData)
-              .attr("d", line);
-
-
-            //Update X axis
-            svgMarathon.select(".xMarathon.axisMarathon")
-                .transition()
-                .duration(1000)
-                .call(xAxisMarathon);
-
-            //Update Y axis
-            svgMarathon.select(".yMarathon.axisMarathon")
-                .transition()
-                .duration(1000)
-                .call(yAxisMarathon);
-
-            // remove the old trendline
-            svgMarathon.selectAll(".men-trendline")
-                       .remove();
-            svgMarathon.selectAll(".women-trendline")
-                       .remove();
-
-            // set the best line for women
-            if (legend === 'both' || legend === 'women') {
-              var trendlineWomen = svgMarathon.selectAll(".trendline").data([[]]);
-              trendlineWomen.enter()
-                .append("line")
-                .attr("class", "women-trendline")
-                .attr("x1", function(d) { return xScaleMarathon(1966); })
-                .attr("y1", function(d) { return yScaleMarathon(179.1138); })
-                .attr("x2", function(d) { return xScaleMarathon(2017); })
-                .attr("y2", function(d) { return yScaleMarathon(131.3931); })
-                .attr("stroke", "blue")
-                .attr("stroke-dasharray", "5")
-                .attr("stroke-width", 1);
-            }
-
-            if (legend === 'both' || legend === 'men') {
-              // set the best line for men
-              var trendlineMen = svgMarathon.selectAll(".trendline").data([[]]);
-              trendlineMen.enter()
-                .append("line")
-                .attr("class", "men-trendline")
-                .attr("x1", function(d) { return xScaleMarathon(1897); })
-                .attr("y1", function(d) { return yScaleMarathon(158.8212); })
-                .attr("x2", function(d) { return xScaleMarathon(2017); })
-                .attr("y2", function(d) { return yScaleMarathon(123.9732); })
-                .attr("stroke", "red")
-                .attr("stroke-dasharray", "5")
-                .attr("stroke-width", 1);
-            }
-          }
         </script>
     </body>
 </html>
