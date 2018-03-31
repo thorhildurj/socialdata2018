@@ -291,7 +291,7 @@
                  }
                });
 
-            //Create one label per state
+            //Create label for each boroughs
             svg.selectAll("text")
              .data(json.features)
              .enter()
@@ -311,6 +311,15 @@
              .attr('font-family', 'Courier New')
              .attr('font-weight', 'bold');
 
+             // Setting title for the geograph
+             svg.append("text")
+                .attr("x", w / 10)
+                .attr("y", h / 2 - 10)
+                //.attr("text-anchor", "middle")
+                .style("font-size", "19px")
+                .style("font-weight", "bolder")
+                .text("Murders in NYC from 2006 to 2016");
+
 
              // we load the murder data and display the bar chart
              d3.csv("all_murder.csv", rowConverter, function(data) {
@@ -328,7 +337,7 @@
                      return projection([d.Longitude, d.Latitude])[1];
                   })
                   .attr("r", 1)
-                  .style("fill", "indigo");
+                  .style("fill", "gold");
 
                 /******* CHART *******/
                 // grouping the murder data by date before rendering the bar chart
