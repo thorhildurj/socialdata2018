@@ -241,8 +241,6 @@
                        .projection(projection);
 
 
-
-
           //Load in GeoJSON data
           d3.json("boroughs.geojson", function(json) {
             //Bind data and create one path per GeoJSON feature
@@ -251,12 +249,51 @@
                .enter()
                .append("path")
                .attr("d", path)
-               .style("fill", "steelblue");
+               .style("fill", function(d){
+                 var value = d.id
+
+                 if (value == 0){
+                   return "mediumaquamarine";
+                 }
+                 else if (value == 1){
+                   return "MediumSeaGreen ";
+                 }
+                 else if (value == 2){
+                   return "lightseagreen ";
+                 }
+                 else if (value == 3){
+                   return "SeaGreen ";
+                 }
+                 else if (value == 4){
+                   return "turquoise ";
+                 }
+               });
+
+            //Create one label per state
+            svg.selectAll("text")
+             .data(json.features)
+             .enter()
+             .append("text")
+             .attr("class", "label")
+             .text(function(d) {
+                  return d.properties.BoroName;
+             })
+             .attr("x", function(d) {
+                return path.centroid(d)[0];
+             })
+             .attr("y", function(d) {
+                return path.centroid(d)[1];
+             })
+             .attr('font-size', '12px')
+             .attr('text-anchor', 'middle')
+             .attr('font-family', 'Courier New')
+             .attr('font-weight', 'bold');
+
 
              // we load the murder data and display the bar chart
-            d3.csv("all_murder.csv", function(data) {
+             d3.csv("all_murder.csv", function(data) {
 
-               // displaying the circles on the map
+               // displaying each murder as a circle on the map
                svg.selectAll("circle")
                   .data(data)
                   .enter()
@@ -268,15 +305,14 @@
                      return projection([d.Longitude, d.Latitude])[1];
                   })
                   .attr("r", 1)
-                  .style("fill", "red");
-
+                  .style("fill", "indigo");
 
                 // grouping the murder data by date before rendering the bar chart
                 var groupedData = d3.nest()
                   .key(function(d) { return d.RPT_DT; })
                   .entries(data);
-             });
 
+              });
 
           });
 
