@@ -241,6 +241,8 @@
 
 
 
+
+
           //Load in GeoJSON data
           d3.json("boroughs.geojson", function(json) {
             //Bind data and create one path per GeoJSON feature
@@ -251,6 +253,9 @@
                .append("path")
                .attr("d", path)
                .style("fill", "steelblue");
+
+    
+
           });
 
           var rowConverter = function(d) {
