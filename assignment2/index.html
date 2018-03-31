@@ -253,9 +253,10 @@
                .attr("d", path)
                .style("fill", "steelblue");
 
-             // we load the data and display the bar chart
+             // we load the murder data and display the bar chart
             d3.csv("all_murder.csv", function(data) {
 
+               // displaying the circles on the map
                svg.selectAll("circle")
                   .data(data)
                   .enter()
@@ -268,6 +269,12 @@
                   })
                   .attr("r", 1)
                   .style("fill", "red");
+
+
+                // grouping the murder data by date before rendering the bar chart
+                var groupedData = d3.nest()
+                  .key(function(d) { return d.RPT_DT; })
+                  .entries(data);
              });
 
 
