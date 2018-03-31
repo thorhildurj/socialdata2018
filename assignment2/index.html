@@ -185,6 +185,9 @@
           <br />
           <br />
           <h2 class="part-header" id="part2">Part 2: Visualizing Murders over Time</h2>
+          <div id="part2-chart">
+
+          </div>
           <div id="part2-map">
 
           </div>
@@ -221,28 +224,46 @@
           ********** PART 2 ***********
           *****************************/
 
-          var w = 600;
-          var h = 600;
 
-          //Create SVG element
+          /******* MAP *******/
+          // variables for map
+          var wMap = 600;
+          var hMap = 600;
+
+          //Create SVG element for map
           svg = d3.select("#part2-map")
                   .append("svg")
-                  .attr("width", w)
-                  .attr("height", h);
+                  .attr("width", wMap)
+                  .attr("height", hMap);
 
-          //Define path generator, using the Albers USA projection
-          // geoMercator()
-          // geoAlbersUsa()
+          //Define path for map
           var projection = d3.geoMercator()
-                             .translate([w/0.013665, h/0.02255])
+                             .translate([wMap/0.013665, hMap/0.02255])
                              .scale([33800]);
-
           var path = d3.geoPath()
                        .projection(projection);
 
 
+          /******* CHART *******/
+          // variables for the bar chart
+          var w = 1200;
+          var h = 200;
+          var xScale, yScale, svgChart, xAxis, yAxis;
+          var padding = 40;
+			    var parseTime = d3.timeParse("%m/%d/%y"); //For converting strings to Dates
+//    			var rowConverter = function(d) {
+//    				return {
+//    					Date: parseTime(d.RPT_DT),
+//    					Latitude: d.Latitude,
+//    					Longitude: d.Longitude,
+//    				};
+//    			}
+
+
           //Load in GeoJSON data
           d3.json("boroughs.geojson", function(json) {
+
+            /******* MAP *******/
             //Bind data and create one path per GeoJSON feature
             svg.selectAll("path")
                .data(json.features)
@@ -293,7 +314,8 @@
              // we load the murder data and display the bar chart
              d3.csv("all_murder.csv", function(data) {
 
-               // displaying each murder as a circle on the map
+               /******* MAP *******/
+               // displaying each murder as a circles on the map
                svg.selectAll("circle")
                   .data(data)
                   .enter()
@@ -307,12 +329,90 @@
                   .attr("r", 1)
                   .style("fill", "indigo");
 
+                /******* CHART *******/
                 // grouping the murder data by date before rendering the bar chart
                 var groupedData = d3.nest()
                   .key(function(d) { return d.RPT_DT; })
                   .entries(data);
 
-              });
+                console.log("Grouped Data", groupedData)
+
+                var dates = [];
+                for (var i = 0; i < groupedData.length; i++) {
+                  dates.push(groupedData[i].key);
+                }
+
+                var slicedNumber = 1000;
+                groupedData = groupedData.slice(0, slicedNumber);
+                dates = dates.slice(0, slicedNumber);
+
+                console.log("Dates", dates)
+
+                // lets create the scales
+                xScale = d3.scaleBand()
+                  .domain(dates)
+                  .rangeRound([padding, w]);  // 'rangeRound' enables rounding
+
+                yScale = d3.scaleLinear()
+                  .domain([0, d3.max(groupedData, function(d) { return d.values.length; })])
+                  .range([h - padding, padding * 2]);
+
+
+                yScale = d3.scaleLinear()
+                  .domain([0, d3.max(groupedData, function(d) { return d.values.length; })])
+                  .range([h - padding, padding * 2]);
+
+                //Create SVG element
+                svgChart = d3.select("#part2-chart")
+                             .append("svg")
+                             .attr("width", w)
+                             .attr("height", h);
+
+                //Create bars
+                svgChart.selectAll("rect")
+                        .data(groupedData)
+                        .enter()
+                        .append("rect")
+                        .attr("x", function(d, i) {
+                           return xScale(d.key);  // Setting x values
+                        })
+                        .attr("y", function(d) {
+                           return yScale(d.values.length);
+                        })
+                        .attr("width", xScale.bandwidth())
+                        .attr("height", function(d) {
+                           return h - yScale(d.values.length) - padding;
+                        })
+                        .attr("fill", function(d) {
+                           return "steelblue";
+                        });
+
+                  // Define X axis
+                  xAxis = d3.axisBottom()
+                      .scale(xScale)
+                      .ticks(5);
+
+                  //Define Y axis
+                  yAxis = d3.axisLeft()
+                            .scale(yScale)
+                            .ticks(5);
+
+                  //Create X axis
+                  svgChart.append("g")
+                          .attr("class", "x axis")
+                          .attr("transform", "translate(0," + (h - padding) + ")")
+                          .call(xAxis);
+
+                  //Create Y axis
+                  svgChart.append("g")
+                          .attr("class", "y axis")
+                          .attr("transform", "translate(" + padding + ",0)")
+                          .call(yAxis);
+
+
+
+
+             });
 
           });
 
