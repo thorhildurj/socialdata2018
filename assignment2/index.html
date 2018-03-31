@@ -250,14 +250,15 @@
           var h = 200;
           var xScale, yScale, svgChart, xAxis, yAxis;
           var padding = 40;
-			    var parseTime = d3.timeParse("%m/%d/%y"); //For converting strings to Dates
-//    			var rowConverter = function(d) {
-//    				return {
-//    					Date: parseTime(d.RPT_DT),
-//    					Latitude: d.Latitude,
-//    					Longitude: d.Longitude,
-//    				};
-//    			}
+			    var parseTime = d3.timeParse("%m/%d/%Y"); //For converting strings to Dates
+    			var rowConverter = function(d) {
+
+    				return {
+    					Date: parseTime(d.RPT_DT),
+    					Latitude: d.Latitude,
+    					Longitude: d.Longitude,
+    				};
+    			}
 
 
           //Load in GeoJSON data
@@ -312,7 +313,7 @@
 
 
              // we load the murder data and display the bar chart
-             d3.csv("all_murder.csv", function(data) {
+             d3.csv("all_murder.csv", rowConverter, function(data) {
 
                /******* MAP *******/
                // displaying each murder as a circles on the map
@@ -332,7 +333,7 @@
                 /******* CHART *******/
                 // grouping the murder data by date before rendering the bar chart
                 var groupedData = d3.nest()
-                  .key(function(d) { return d.RPT_DT; })
+                  .key(function(d) { return d.Date; })
                   .entries(data);
 
                 console.log("Grouped Data", groupedData)
@@ -345,8 +346,6 @@
                 var slicedNumber = 1000;
                 groupedData = groupedData.slice(0, slicedNumber);
                 dates = dates.slice(0, slicedNumber);
-
-                console.log("Dates", dates)
 
                 // lets create the scales
                 xScale = d3.scaleBand()
@@ -415,15 +414,6 @@
              });
 
           });
-
-          var rowConverter = function(d) {
-            return {
-              Index: parseInt(d.Index),
-              Month: d.Month,
-              Count: parseInt(d.Count),
-            };
-          }
-
 
 
 
