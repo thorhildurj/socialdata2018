@@ -181,7 +181,7 @@
             </ul>
 
 
-          <!-- ########################  PART 2  ####################### -->
+<!-- ########################  PART 2  ####################### -->
           <br />
           <br />
           <h2 class="part-header" id="part2">Part 2: Visualizing Murders over Time</h2>
@@ -237,8 +237,8 @@
                              .translate([w/0.013665, h/0.02255])
                              .scale([33800]);
 
-          var path = d3.geoPath().projection(projection);
-
+          var path = d3.geoPath()
+                       .projection(projection);
 
 
 
@@ -246,7 +246,6 @@
           //Load in GeoJSON data
           d3.json("boroughs.geojson", function(json) {
             //Bind data and create one path per GeoJSON feature
-            console.log("json", json)
             svg.selectAll("path")
                .data(json.features)
                .enter()
@@ -254,7 +253,23 @@
                .attr("d", path)
                .style("fill", "steelblue");
 
-    
+             // we load the data and display the bar chart
+            d3.csv("all_murder.csv", function(data) {
+
+               svg.selectAll("circle")
+                  .data(data)
+                  .enter()
+                  .append("circle")
+                  .attr("cx", function(d) {
+                    return projection([d.Longitude, d.Latitude])[0];
+                  })
+                  .attr("cy", function(d) {
+                     return projection([d.Longitude, d.Latitude])[1];
+                  })
+                  .attr("r", 1)
+                  .style("fill", "red");
+             });
+
 
           });
 
@@ -266,11 +281,7 @@
             };
           }
 
-          // we load the data and display the bar chart
-          d3.csv("all_murder.csv", function(data) {
 
-
-          });
 
 
         </script>
