@@ -444,6 +444,27 @@
       						.attr("transform", "translate(" + padding + ",0)")
       						.call(yAxis);
 
+                // Setting y label
+                svg.append("text")
+                   .attr("transform", "rotate(-90)")
+                   .attr("y", 0)
+                   .attr("x",0 - (h / 2))
+                   .attr("dy", "1em")
+                   .style("text-anchor", "middle")
+                   .style("font-weight", "bolder")
+                   .style("font-size", "13px")
+                   .text("Number of murders");
+
+               // Setting x label
+               svg.append("text")
+                  .attr("y", h - 25)
+                  .attr("x", (w / 2))
+                  .attr("dy", "1em")
+                  .style("text-anchor", "middle")
+                  .style("font-weight", "bolder")
+                  .style("font-size", "13px")
+                  .text("Date");
+
                 // setting the brush
                 brush = d3.brushX()
                         .extent([[0, 0], [w, h]])
