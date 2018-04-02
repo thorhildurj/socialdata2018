@@ -48,15 +48,50 @@
 					//var slicedNumber = 2000;
 					//groupedData = groupedData.slice(0, slicedNumber);
 
-
 					//Print data to console
 					console.log("Grouped Data", groupedData)
+
+					//Checking days witn no murders
+					var myDay;
+					var dayBefore;
+					var newObject;
+					var newDataset = [];
+
+				  for (var i = 0; i < groupedData.length; i++){
+
+						myDay = new Date(groupedData[i].key);
+						newDataset.push(groupedData[i]);
+
+						if (i == groupedData.length - 1) {
+							continue;
+						}
+
+						dayBefore = new Date(myDay);
+					  dayBefore.setDate(myDay.getDate() - 1)
+
+						while (groupedData[i+1].key != dayBefore) {
+							newObject = {key: dayBefore.toString(),
+													 values: []}
+							newDataset.push(newObject);
+							dayBefore.setDate(dayBefore.getDate() - 1)
+						}
+
+					}
+					console.log("Newdata", newDataset);
+
+
+					//Adding a new date to the list
+					//var newData = {key: "Sat Dec 24 2015 00:00:00 GMT+0100 (CET)",
+					//						   values: []}
+					//groupedData.push(newData)
+
+					groupedData = newDataset;
 
 					//Create scale functions
 				  xScale = d3.scaleTime()
 								   .domain([
-										d3.min(groupedData, function(d) { return d.values[0].date; }),
-										d3.max(groupedData, function(d) { return d.values[0].date; })
+										d3.min(groupedData, function(d) { return new Date(d.key); }),
+										d3.max(groupedData, function(d) { return new Date(d.key); })
 									])
 								   .range([padding, w-padding]);
 
@@ -78,7 +113,7 @@
 
 					//Define line generator
 					line = d3.line()
-								.x(function(d) { return xScale(d.values[0].date); })
+								.x(function(d) { return xScale(new Date(d.key)); })
 								.y(function(d) { return yScale(d.values.length); });
 
 					//Create SVG element
