@@ -38,12 +38,16 @@
 												.key(function(d) { return d.date; })
 												.entries(data);
 
-					//console.log(groupedData);
+					//Lets sort the data
+					groupedData.sort(function(a, b) {
+						a = new Date(a.key);
+						b = new Date(b.key);
+						return a>b ? -1 : a<b ? 1 : 0;
+					});
 
-					//groupedData = data;
+					//var slicedNumber = 2000;
+					//groupedData = groupedData.slice(0, slicedNumber);
 
-					var slicedNumber = 20;
-					groupedData = groupedData.slice(0, slicedNumber);
 
 					//Print data to console
 					console.log("Grouped Data", groupedData)
@@ -94,12 +98,11 @@
 						.attr("class", "axis")
 						.attr("transform", "translate(0," + (h - padding) + ")")
 						.call(xAxis);
+
 					svg.append("g")
 						.attr("class", "axis")
 						.attr("transform", "translate(" + padding + ",0)")
 						.call(yAxis);
-
-
 				});
 
 		</script>
