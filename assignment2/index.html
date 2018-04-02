@@ -150,6 +150,12 @@
               font-style: oblique;
             }
 
+            .line {
+              fill: none;
+              stroke: teal;
+              stroke-width: 0.5;
+            }
+
         </style>
     </head>
     <body>
@@ -285,7 +291,7 @@
           var hMap = 600;
 
           //Create SVG element for map
-          svg = d3.select("#part2-map")
+          var svgMap = d3.select("#part2-map")
                   .append("svg")
                   .attr("width", wMap)
                   .attr("height", hMap);
@@ -300,15 +306,15 @@
 
           /******* CHART *******/
           // variables for the bar chart
-          var w = 1200;
-          var h = 200;
-          var xScale, yScale, svgChart, xAxis, yAxis;
-          var padding = 40;
+          var w = 1000;
+    			var h = 200;
+    			var padding = 40;
+    			var groupedData, xScale, yScale, line, xAxis, yAxis;
 			    var parseTime = d3.timeParse("%m/%d/%Y"); //For converting strings to Dates
     			var rowConverter = function(d) {
 
     				return {
-    					Date: parseTime(d.RPT_DT),
+    					date: parseTime(d.RPT_DT),
     					Latitude: d.Latitude,
     					Longitude: d.Longitude,
     				};
@@ -320,7 +326,7 @@
 
             /******* MAP *******/
             //Bind data and create one path per GeoJSON feature
-            svg.selectAll("path")
+            svgMap.selectAll("path")
                .data(json.features)
                .enter()
                .append("path")
@@ -346,7 +352,7 @@
                });
 
             //Create label for each boroughs
-            svg.selectAll("text")
+            svgMap.selectAll("text")
              .data(json.features)
              .enter()
              .append("text")
@@ -366,9 +372,9 @@
              .attr('font-weight', 'bold');
 
              // Setting title for the geograph
-             svg.append("text")
-                .attr("x", w / 10)
-                .attr("y", h / 2 - 10)
+             svgMap.append("text")
+                .attr("x", wMap / 10)
+                .attr("y", hMap / 2 - 210)
                 .style("font-size", "19px")
                 .style("font-weight", "bolder")
                 .text("Murders in NYC from 2006 to 2016");
@@ -377,9 +383,11 @@
              // we load the murder data and display the bar chart
              d3.csv("all_murder.csv", rowConverter, function(data) {
 
+               console.log("DATA", data)
+
                /******* MAP *******/
                // displaying each murder as a circles on the map
-               svg.selectAll("circle")
+               svgMap.selectAll("circle")
                   .data(data)
                   .enter()
                   .append("circle")
@@ -393,79 +401,75 @@
                   .style("fill", "gold");
 
                 /******* LINE CHART *******/
-                // grouping the murder data by date before rendering the bar chart
-                var groupedData = d3.nest()
-                  .key(function(d) { return d.Date; })
-                  .entries(data);
+                groupedData = d3.nest()
+      												.key(function(d) { return d.date; })
+      												.entries(data);
 
-                console.log("Grouped Data", groupedData)
+      					//Lets sort the data
+      					groupedData.sort(function(a, b) {
+      						a = new Date(a.key);
+      						b = new Date(b.key);
+      						return a>b ? -1 : a<b ? 1 : 0;
+      					});
 
-                var dates = [];
-                for (var i = 0; i < groupedData.length; i++) {
-                  dates.push(groupedData[i].key);
-                }
+      					//var slicedNumber = 2000;
+      					//groupedData = groupedData.slice(0, slicedNumber);
 
-                console.log("Dates", dates)
 
-                var slicedNumber = 1000;
-                groupedData = groupedData.slice(0, slicedNumber);
-                dates = dates.slice(0, slicedNumber);
+      					//Print data to console
+      					console.log("Grouped Data", groupedData)
 
-                // lets create the scales
-                xScale = d3.scaleBand()
-                  .domain(dates)
-                  .rangeRound([padding, w]);  // 'rangeRound' enables rounding
+      					//Create scale functions
+      				  xScale = d3.scaleTime()
+      								   .domain([
+      										d3.min(groupedData, function(d) { return d.values[0].date; }),
+      										d3.max(groupedData, function(d) { return d.values[0].date; })
+      									])
+      								   .range([padding, w-padding]);
 
-                yScale = d3.scaleLinear()
-                  .domain([0, d3.max(groupedData, function(d) { return d.values.length; })])
-                  .range([h - padding, padding * 2]);
+      					yScale = d3.scaleLinear()
+      									.domain([0, d3.max(groupedData, function(d) { return d.values.length; })])
+      									.range([h - padding, 0]);
 
-                //Create SVG element
-                svgChart = d3.select("#part2-chart")
-                             .append("svg")
-                             .attr("width", w)
-                             .attr("height", h);
+      					//Define axes
+      					xAxis = d3.axisBottom()
+      							   .scale(xScale)
+      							   .ticks(10);
+      							   //.tickFormat(parseTime);
 
-                //Create bars
-                svgChart.selectAll("rect")
-                        .data(groupedData)
-                        .enter()
-                        .append("rect")
-                        .attr("x", function(d, i) {
-                           return xScale(d.key);  // Setting x values
-                        })
-                        .attr("y", function(d) {
-                           return yScale(d.values.length);
-                        })
-                        .attr("width", xScale.bandwidth())
-                        .attr("height", function(d) {
-                           return h - yScale(d.values.length) - padding;
-                        })
-                        .attr("fill", function(d) {
-                           return "steelblue";
-                        });
+      					//Define Y axis
+      				  yAxis = d3.axisLeft()
+      								.scale(yScale)
+      								.ticks(5);
 
-                  // Define X axis
-                  xAxis = d3.axisBottom()
-                      .scale(xScale)
-                      .ticks(5);
 
-                  //Define Y axis
-                  yAxis = d3.axisLeft()
-                            .scale(yScale)
-                            .ticks(5);
+      					//Define line generator
+      					line = d3.line()
+      								.x(function(d) { return xScale(d.values[0].date); })
+      								.y(function(d) { return yScale(d.values.length); });
 
-                  //Create X axis
-                  svgChart.append("g")
-                          .attr("class", "x axis")
-                          .attr("transform", "translate(0," + (h - padding) + ")")
-                          .call(xAxis);
+      					//Create SVG element
+      					var svg = d3.select("#part2-chart")
+      								.append("svg")
+      								.attr("width", w)
+      								.attr("height", h);
 
-                  //Create Y axis
-                  svgChart.append("g")
-                          .attr("class", "y axis")
-                          .attr("transform", "translate(" + padding + ",0)")
-                          .call(yAxis);
+      					//Create line
+      					svg.append("path")
+      						.datum(groupedData)
+      						.attr("class", "line")
+      						.attr("d", line);
+
+      						//Create axes
+      					svg.append("g")
+      						.attr("class", "axis")
+      						.attr("transform", "translate(0," + (h - padding) + ")")
+      						.call(xAxis);
+
+      					svg.append("g")
+      						.attr("class", "axis")
+      						.attr("transform", "translate(" + padding + ",0)")
+      						.call(yAxis);
 
 
              });
