@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>D3: Line chart testing for assignment 2</title>
+		<script type="text/javascript" src="../d3.js"></script>
+		<style type="text/css">
+			.line {
+				fill: none;
+				stroke: teal;
+				stroke-width: 0.5;
+			}
+		</style>
+	</head>
+	<body>
+		<script type="text/javascript">
+			//Width and height
+			var w = 800;
+			var h = 300;
+			var padding = 40;
+			var groupedData, xScale, yScale, line, xAxis, yAxis;
+
+			var parseTime = d3.timeParse("%m/%d/%Y"); //For converting strings to Dates
+
+			var rowConverter = function(d) {
+				return {
+					//Date: parseTime(d.RPT_DT),
+					date: parseTime(d.RPT_DT),
+					Latitude: parseFloat(d.Latitude),
+					Longitude: parseFloat(d.Longitude)
+				};
+			}
+
+			//Load in data
+			d3.csv("all_murder-testing.csv", rowConverter, function(data) {
+
+					groupedData = d3.nest()
+												.key(function(d) { return d.date; })
+												.entries(data);
+
+					//console.log(groupedData);
+
+					//groupedData = data;
+
+					var slicedNumber = 20;
+					groupedData = groupedData.slice(0, slicedNumber);
+
+					//Print data to console
+					console.log("Grouped Data", groupedData)
+
+					//Create scale functions
+				  xScale = d3.scaleTime()
+								   .domain([
+										d3.min(groupedData, function(d) { return d.values[0].date; }),
+										d3.max(groupedData, function(d) { return d.values[0].date; })
+									])
+								   .range([padding, w-padding]);
+
+					yScale = d3.scaleLinear()
+									.domain([0, d3.max(groupedData, function(d) { return d.values.length; })])
+									.range([h - padding, 0]);
+
+					//Define axes
+					xAxis = d3.axisBottom()
+							   .scale(xScale)
+							   .ticks(10);
+							   //.tickFormat(parseTime);
+
+					//Define Y axis
+				  yAxis = d3.axisLeft()
+								.scale(yScale)
+								.ticks(5);
+
+
+					//Define line generator
+					line = d3.line()
+								.x(function(d) { return xScale(d.values[0].date); })
+								.y(function(d) { return yScale(d.values.length); });
+
+					//Create SVG element
+					var svg = d3.select("body")
+								.append("svg")
+								.attr("width", w)
+								.attr("height", h);
+
+					//Create line
+					svg.append("path")
+						.datum(groupedData)
+						.attr("class", "line")
+						.attr("d", line);
+
+						//Create axes
+					svg.append("g")
+						.attr("class", "axis")
+						.attr("transform", "translate(0," + (h - padding) + ")")
+						.call(xAxis);
+					svg.append("g")
+						.attr("class", "axis")
+						.attr("transform", "translate(" + padding + ",0)")
+						.call(yAxis);
+
+
+				});
+
+		</script>
+	</body>
+</html>
