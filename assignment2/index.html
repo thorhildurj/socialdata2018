@@ -309,7 +309,7 @@
           var w = 1000;
     			var h = 200;
     			var padding = 40;
-    			var groupedData, xScale, yScale, line, xAxis, yAxis;
+    			var murderData, groupedData, xScale, yScale, line, xAxis, yAxis, brush, extent;
 			    var parseTime = d3.timeParse("%m/%d/%Y"); //For converting strings to Dates
     			var rowConverter = function(d) {
 
@@ -382,8 +382,7 @@
 
              // we load the murder data and display the bar chart
              d3.csv("all_murder.csv", rowConverter, function(data) {
-
-               console.log("DATA", data)
+               murderData = data;
 
                /******* MAP *******/
                // displaying each murder as a circles on the map
@@ -400,20 +399,19 @@
                   .attr("r", 1)
                   .style("fill", "gold");
 
+
                 /******* LINE CHART *******/
                 groupedData = d3.nest()
       												.key(function(d) { return d.date; })
       												.entries(data);
 
-      					//Lets sort the data
+      					//Lets sort the grouped data
       					groupedData.sort(function(a, b) {
       						a = new Date(a.key);
       						b = new Date(b.key);
       						return a>b ? -1 : a<b ? 1 : 0;
       					});
 
-      					//Print data to console
-      					console.log("Grouped Data", groupedData)
 
                 //Checking days witn no murders
       					var myDay;
@@ -441,7 +439,6 @@
       						}
 
       					}
-      					console.log("Newdata", newDataset);
 
                 //Making our new dataset with the no murder days the dataset
                 groupedData = newDataset;
@@ -498,12 +495,72 @@
       						.attr("transform", "translate(" + padding + ",0)")
       						.call(yAxis);
 
+                // setting the brush
+                brush = d3.brushX()
+                        .extent([[0, 0], [w, h]])
+                        .on("brush", highlightBrushed);
+                        // .on("end", onBrushEnd);
+
+                svg.append("g")
+                   .call(brush);
+
 
              });
 
           });
 
+          /******* BRUSH FUNCTIONS: MAP & CHART *******/
 
+          function highlightBrushed() {
+               if (d3.event.selection != null) {
+
+                 var extent = d3.event.selection.map(xScale.invert, xScale);
+
+                 // extract left and right edge date information from the extent
+                 var leftTime = extent[0].getTime();
+                 var rightTime = extent[1].getTime();
+                 var leftTimeDate = new Date(leftTime);
+                 var rightTimeDate = new Date(rightTime);
+
+                 // create new data array with the selected data
+                 var selectedData = [];
+                 for (var i = 0; i < murderData.length; i++) {
+                   if (murderData[i].date > leftTimeDate && murderData[i].date < rightTimeDate) {
+                     selectedData.push(murderData[i])
+                   }
+                 }
+
+                 // if no data is selected we show the whole dataset
+                 if (selectedData.length == 0) {
+                   selectedData = murderData;
+                 }
+
+                 // update map with selected data
+                 updateMapWithSelectedData(selectedData);
+               }
+           }
+
+           function updateMapWithSelectedData(selectedData) {
+
+             // removing all circles
+             svgMap.selectAll("circle").remove();
+                          //.exit().remove();//remove unneeded circles
+
+
+             // adding circles
+             svgMap.selectAll(".dummySelection")
+                .data(selectedData)
+                .enter()
+                .append("circle")
+                .attr("cx", function(d) {
+                  return projection([d.Longitude, d.Latitude])[0];
+                })
+                .attr("cy", function(d) {
+                   return projection([d.Longitude, d.Latitude])[1];
+                })
+                .attr("r", 1)
+                .style("fill", "gold");
+           }
 
         </script>
     </body>
