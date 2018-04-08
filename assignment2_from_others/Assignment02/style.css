@@ -1,0 +1,84 @@
+
+.pan rect {
+    fill: black;
+    opacity: 0.2;
+}
+
+.pan text {
+    fill: black;
+    font-size: 18px;
+    text-anchor: middle;
+}
+
+.pan:hover rect,
+.pan:hover text {
+    opacity: 0.6;
+}
+
+.parent {
+    margin-left: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.right {
+    margin-left: -140px;
+    flex-grow: 1;
+}
+
+.left{
+    /* margin-left: 200px; */ 
+}
+
+.notSelected{
+    opacity:0.5;
+    fill:yellow;
+}
+
+.selected{
+    opacity:0.9;
+    fill:red;
+}
+
+.preselection{
+    fill: black;   
+}
+
+.line{
+    fill:none;
+    stroke: #3378be;
+    stroke-width: 1px;
+    
+}
+
+boroNames{
+    color: white;
+}
+
+.headerContainer{
+    text-align: center;
+    font-family: "Lucida Console", Monaco, monospace
+}
+
+.questionContainer{
+     border-radius: 25px;
+    display: flex;
+    flex-direction: row;
+    flex: 2; 
+    background-color: #6699ce85;
+}
+
+.part1 {
+    flex:1;
+    margin: 1%;
+}
+.part2 {
+    flex:1;
+    margin:1%;
+}
+
+
+
+.invisibleToMouse{
+     pointer-events: none; 
+}

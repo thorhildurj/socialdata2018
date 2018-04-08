@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">    
+    <head>        
+        <meta charset="utf-8">        
+        <title>Assignment 1</title>        
+        <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>    
+        <link rel="stylesheet" href="style.css">
+    </head>    
+    <body>     
+    
+    <div class="sidenav">
+    <div id="headernav">
+        <h3>02806</h3>
+        <h3>Assignment 2</h3>
+    </div>
+    <div id="navdivision">MAIN NAVIGATION</div>
+    <div class="navelem"><a href="#part1">Part 1</a></div>
+    <div class="navelem"><a href="#part2">Part 2</a></div>
+    </div>
+
+    <div id="content">
+        <div id="part1">
+            <h2>Part 1: Telling Data Stories</h2>
+            <ul class="bullet">
+                <li>What is the Oxford English Dictionary's defintion of a narrative?</li>
+                <p>The definition of <i>narrative</i> in the Oxford English Dictionary's is "an account of a series of events, facts, etc., given in order and with the establishing of connections between them."[1]. In other words, a narrative is a chain of events that involve a conflict, with a beginning, middle and a resolution.</p>
+                <li>What is your favorite visualization among the examples in section 3? Explain why in a few words.</li>
+                <p>The visualization 3.4: Gapminder Human Development Trends [2]. The layout is very clear and because of the grid also easy to understand at first glance. There are informative labels that helps the user to navigate between distinct contents. However, it is the animation that makes the visualization so impressive.</p>
+                <li>What's the point of Figure 7?</li>
+                <p>The point of Figure 7 is to provide an overview of the design space analysis of narrative visualization. In particular, it specifies the genre, visual narrative tactics and narrative structure tactics of each of the 58 analyzed visualizations by marking the specific features utilized in each one of them. In other words, it attempts to display the taxonomy which the authors have devised when trying to structure the visualizations. In addition, it marks the regions which highlight some patterns in the data, showcasing things such as strategies corresponding to genres of visual narration, the consistency of interactive designs, as well as makes some points regarding under-utilization of common storytelling techniques and of user engagement strategies.</p>
+                <li>Use Figure 7 to find the most common design choice within each category for the Visual narrative and Narrative structure (the categories within visual narrative are 'visual structuring', 'highlighting', etc).</li>
+                <p>Having analyzed Figure 7, we have determined the following most common design choices:
+                <br><br><b>Visual Narrative</b></p>
+                <div style="margin-left:10px">Visual Structuring - Consistent Visual Platform (34/58 Visualizations)
+                <br>    Highlighting - Feature Distinction (46/58 Visualizations)
+                <br>    Transition Guidance - Object Continuity (22/58 Visualizations)</div>
+                <p><b>Narrative Structure</b>
+                <div style="margin-left:10px">Ordering - User Directed Path (31/58 Visualizations)
+                <br>    Interactivity - Filtering / Selection / Sort (38/58 Visualizations)
+                <br>    Messaging - Captions / Headlines (39/58 Visualizations)</div>
+                </p>
+                <li>Check out Figure 8 and section 4.3.</li>
+                <li style="margin-left:10px">What is your favorite genre of narrative visualization? Why?</li>
+                <p>Personally, I like the animation (video) genre. When an animation is complemented by spoken narration, it can lead to better understanding of the story. It can, for example, clarify the connection of two seemingly disconnected parts of the visualization. And even though video is not interactive, it is a great tool to present the message that the author intended.</p>
+                <li style="margin-left:10px">What is your least favorite genre? Why?</li>
+                <p>When using slide shows, a person needs to click himself through the slides. Sometimes, there are only numbers that indicate which slide is being presented. This can be a drawback as the user needs to remember what number represents what content.</p>
+            </ul>
+        </div>
+        
+        <div id="part2" style="margin-top:60px">
+            <h2>Part 2: Visualizing Murders over Time</h2>
+            <div style="margin-bottom:50px"><i>Exercise: Create a visualization of murders in all of NYC over time.</i></div>
+        </div>
+            <div id = "linegraph" class="" style="margin-left:30px">
+            </div>
+        <div class="centergraphs" style="margin-top:10px; width: 1110px;">
+        <button class="button button1" onclick="makeBrush()">Animate</button>
+        </div>
+        <div class="" >
+            <div id = "graphics">
+                <div id="mapgraph" class="centergraphs2">
+                </div>        
+                <div id = "barchar" class="centergraphs2">
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top:60px"  class="part2x">
+            <h2>References</h2>
+            <p>[1] <span style="padding-left:1em">Edward Segel and Jeffrey Heer, Narrative Visualization: Telling Stories with Data, Chapter 2.1, page 1.</span></p>
+            <p>[2] <span style="padding-left:1em">Gapminder. Gapminder Human Development. Gapminder, 2005. <a href="http://www.gapminder.org/downloads/human-development-trends-2005/">http://www.gapminder.org/downloads/human-development-trends-2005/</a>.</span></p>
+            
+        </div>
+        
+    </div>
+
+    <script type="text/javascript">      
+    //Width and height
+    var w = 600;
+    var h = 500;
+    var width = 1050;
+    var height = 200;
+    var padding = 30;
+    var xScale;
+    var brush;
+    var circles;
+    var mindate, maxdate;
+    var colors = ["#c9a898","#c9b298","#978163","#8aa18a","#948588"];
+    //var colors = ["#595f5f","#92b1af","#f8d680","#d4674c","#7e4133"];
+    var formatTime = d3.timeFormat("%Y");
+    
+    //Create SVG element
+    var svg = d3.select("#mapgraph")
+                .append("svg")
+                .attr("width", w)
+                .attr("height", h);
+    
+    //Load in GeoJSON data
+    d3.json("boroughs.json", function(json) {
+    
+        var center = d3.geoCentroid(json); // need this to center the projection correctly
+    
+        var projection = d3.geoMercator()
+                        .center(center)
+                        .scale(45000)
+                        .translate([(w) / 2, (h)/2]);
+                        
+        //Define path generator, using the Albers USA projection
+        var path = d3.geoPath() 
+                .projection(projection);
+                
+        //Bind data and create one path per GeoJSON feature
+        svg.selectAll("path")
+        .data(json.features)
+        .enter()
+        .append("path")
+        .attr("d", path)
+        .style("fill", function(d) {
+               var value = d.properties.BoroCode;
+               return colors[parseInt(value-1)];
+           });
+           
+        //Row convertion of date
+       var rowConverter = function(d) {
+            return {
+                //Make a new Date object for each year + month
+                INDEX: d.INDEX,
+                BORO_NM: d.BORO_NM,
+                RPT_DT: new Date(d.RPT_DT),
+                CMPLNT_FR_TM: d.CMPLNT_FR_TM,
+                Latitude: d.Latitude,
+                Longitude: d.Longitude
+            };
+        }
+        
+        var datah = [];
+        var datahours2 = [];
+        d3.csv("all_murder.csv", rowConverter, function(data) {
+                
+                circles = svg.selectAll("circle")
+                    .data(data)
+                    .enter()
+                    .append("circle")
+                    .attr("cx", function(d) {
+                            return projection([d.Longitude, d.Latitude])[0];
+                    })
+                    .attr("cy", function(d) {
+                            return projection([d.Longitude, d.Latitude])[1];
+                    })
+                    .attr("r", 3)
+                    .style("stroke", " #8e1b54")
+                    .style("stroke-width", 0.55)
+                    .attr("date", function(d) {
+                            return new Date(d.RPT_DT);
+                    })
+                    .attr("class", "non_brushed")
+                    .attr("style", "display:none");
+                    
+      
+                //Data for the time line, group by date and count 
+                var murdersperday0 = d3.nest()
+                .key(function(d) { return new Date(d.RPT_DT) })
+                .rollup(function(v) { return v.length })
+                .entries(data);
+                
+                //Sort per key (date)
+                murdersperday0.sort(function(a,b){
+                    var c = new Date(a.key);
+                    var d = new Date(b.key);
+                    return c-d;
+                });
+                
+                //This is to set dates that are not include in the csv with value 0
+                mindate = d3.min(data, function(d) { return d.RPT_DT; });
+                maxdate = d3.max(data, function(d) { return d.RPT_DT; });
+                var date_range = d3.timeDay.range(mindate,
+                    maxdate,1);
+
+                var m = d3.map(murdersperday0, function(d) { return d.key });
+                var murdersperday = date_range.map(function(bucket) {
+                    return m.get(bucket) || {key: bucket, value: 0};
+                });
+                //
+                
+                
+                xScale = d3.scaleTime()
+               .domain([
+                    mindate,
+                    maxdate
+                ])
+               .range([padding, width]);
+               
+               var yScale = d3.scaleLinear()
+               .domain([0, d3.max(murdersperday, function(d) { return d.value; })])
+               .range([height - padding, padding]);
+               
+               //Define axes
+                xAxis = d3.axisBottom()
+                        .scale(xScale)
+                        .ticks(10)
+                        .tickFormat(formatTime);
+                        
+                //Define Y axis
+                yAxis = d3.axisLeft()
+                        .scale(yScale)
+                        .ticks(10);
+                        
+                //Define line generator
+                var line = d3.line()
+                 .x(function(d) { return xScale(new Date(d.key)); })
+                 .y(function(d) { return yScale(d.value); });
+                 
+                //Create SVG element
+                var svg2 = d3.select("#linegraph")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height);
+                 
+                //Create line
+                var linegraph = svg2.append("path")
+                .datum(murdersperday)
+                .attr("class", "line")
+                .attr("d", line)
+                .attr("fill", "none")
+                .attr("stroke", "steelblue");
+                
+                //Create axes
+                svg2.append("g")
+                        .attr("class", "axis")
+                        .attr("transform", "translate(0," + (height - padding) + ")")
+                        .call(xAxis);
+
+                svg2.append("g")
+                        .attr("class", "axis")
+                        .attr("transform", "translate(" + padding + ",0)")
+                        .call(yAxis);
+                        
+                //Define clipping path
+                svg2.append("clipPath")                  
+                    .attr("id", "chart-area")           
+                    .append("rect")      
+                    .attr("width", width)
+                    .attr("height", height-padding);
+                    
+                //Label of the Y axis
+                svg2.append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", 0)
+                    .attr("x",-100)
+                    .attr("dy", "1em")
+                    .style("font-size", "11px")
+                    .style("text-anchor", "middle")
+                    .style("font-weight", "bold")
+                    .text("# of Murders Commited");
+                    
+                //Title of the plot
+                svg2.append("text")
+                        .attr("y",height-2)
+                        .attr("x", width/2)
+                        .style("font-size", "11px")
+                        .style("text-anchor", "middle")
+                        .style("font-weight", "bold")
+                        .text("Day");
+                
+                //For brush
+                var x = d3.scaleLinear().range([0, width]),
+                x2 = d3.scaleTime().range([0, width]);
+                brush = d3.brushX()
+                .extent([[padding, padding-1], [width, height-padding]])
+                .on('end', () => { if (d3.event.selection==null) circles.attr("class", "non_brushed").attr("style", "display:none");})
+                .on("brush", highlightlines);
+                        
+                gBrush = svg2.append("g")
+                .attr("class", "x brush")
+                .attr("clip-path", "url(#chart-area)")   //Add reference to clipPath
+                .call(brush);
+                
+                
+                gBrush2 = gBrush.selectAll("rect")
+                .attr("y", 1)
+                .attr("height", height-padding);
+                
+                //
+                //BAR CHAR for hours
+                ////////////
+                var brush2 = d3.brush()
+                                .on("brush", brushcircls)
+                                .on("end", changebarchar); 
+
+                svg.append("g")
+                    .call(brush2);
+                    
+                data.forEach(function(d) {
+                    var hour = (d.CMPLNT_FR_TM);
+                    if (datahours2[hour] == undefined) {
+                        datahours2[hour] = 1;
+                    }
+                    else
+                        datahours2[hour] += 1;
+                });
+                //var keys = Object.keys(datahours2).sort();
+                
+                var hours = [];
+                for (var i = 0; i < datahours2.length; i++) {
+                    datah.push([i,datahours2[i]]);
+                    hours.push(datah[i][0]);
+                }
+                
+                //Width and height
+                var width2 = 500;
+                var height2 = 300;
+                var botPadding = 40;
+                var sidePadding = 45;
+                
+                //Scales
+                var xScaleB = d3.scaleBand() //create an ordinal scale
+                            .domain(hours)
+                            .rangeRound([sidePadding, width2-sidePadding])
+                            .paddingInner(0.25); //for the bars not touching each other
+                
+                var yScaleb = d3.scaleLinear()
+                            .domain([0, d3.max(datah, function(d){ return d[1]; })]) //max of all d[1]
+                            .range([botPadding, height2-botPadding]);
+                
+                //Create SVG element
+                var svg3 = d3.select("#barchar")
+                            .append("svg")
+                            .attr("width", width2)
+                            .attr("height", height2);
+
+                //Create bars
+                svg3.selectAll("rect")
+                    .data(datah)
+                    .enter()
+                    .append("rect")
+                    .attr("x", function(d) {
+                                return xScaleB(d[0]); // months from Jan to Dec will be scaled to positions in x axis
+                    })
+                    .attr("y", function(d) {
+                                return height2 - yScaleb(d[1]); 
+                    })
+                    .attr("width", xScaleB.bandwidth()) //width per bar
+                    .attr("height", function(d) {
+                                return yScaleb(d[1]) - botPadding; 
+                    })
+                    .attr("fill", function(d) {
+                                return "#45005f";
+                    });
+                                    
+                //X axis
+                var xAxis2 = d3.axisBottom();
+                xAxis2.scale(xScaleB);
+                svg3.append("g")
+                        .attr("class", "x axis")
+                        .attr("transform", "translate(0, " + (height2 - botPadding) + ")")
+                        .call(xAxis2);
+                //Y axis
+                var yAxis2 = d3.axisLeft();
+                yAxis2.scale(yScaleb.range([height2-botPadding, botPadding]));
+                yAxis2.tickFormat(d3.format("d")); 
+                svg3.append("g")
+                        .attr("class", "y axis")
+                        .attr("transform", "translate(" + (sidePadding) + ",0)")                
+                        .call(yAxis2);
+                                
+                //Label of the Y axis
+                svg3.append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", sidePadding-45)
+                    .attr("x",-155)
+                    .attr("dy", "1em")
+                    .style("font-size", "12px")
+                    .style("text-anchor", "middle")
+                    .style("font-weight", "bold")
+                    .text("# of Murders Commited");
+                    
+                //label x axis
+                svg3.append("text")
+                        .attr("y",height2-2)
+                        .attr("x", width2/2)
+                        .style("font-size", "12px")
+                        .style("text-anchor", "middle")
+                        .style("font-weight", "bold")
+                        .text("Hour");
+                
+                function changebarchar() {
+                    if (d3.event.selection==null) 
+                        d3.selectAll(".brushedhours").attr("class", "brushed");
+                
+                    var d_brushed =  d3.selectAll(".brushedhours").data();
+                    var h = 300;
+                    
+                    var newDataset2 = {};
+                    var newDataset = [];
+                    for (var i = 0; i < d_brushed.length; i++) {
+                        var hour = (d_brushed[i]["CMPLNT_FR_TM"]).split(":")[0];
+                    
+                        if (newDataset2[hour] == undefined) {
+                            newDataset2[hour] = 1;
+                        }
+                        else
+                            newDataset2[hour] += 1;
+                    }
+                    
+                    for (var i = 0; i < hours.length; i++) {
+                        if (newDataset2[i] != undefined)
+                            newDataset.push([i,newDataset2[i]]);
+                        else 
+                            newDataset.push([i,0]);
+                    }
+
+                    yScaleb.domain([0, d3.max(newDataset, function(d){
+                                                    return d[1]; //numeric value here
+                                            })]);
+                    if (yScaleb.domain() [1] < 10)
+                        yAxis2.ticks(yScaleb.domain()[1]);
+                    else
+                        yAxis2.ticks(10);
+                        
+                    svg3.selectAll("g.y.axis").transition().duration(500).call(yAxis2.scale(yScaleb.range([h-botPadding, botPadding])));
+                    // return range to normal for bars
+                    yScaleb.range([botPadding, h-botPadding]);
+
+                    // rebind data
+                    svg3.selectAll("rect")
+                        .data(newDataset)
+                        .transition() 
+                        .duration(500)
+                        .ease(d3.easeCubicInOut) 
+                        .attr("y", function(d){
+                            return h - yScaleb(d[1]);
+                            })
+                        .attr("height", function(d){
+                            return yScaleb(d[1]) - botPadding;
+                            });
+                }
+                
+                //brush for map circles
+                function brushcircls() {
+                        //circles.attr("class", "non_brushed");
+                        d3.selectAll(".brushedhours").attr("class", "brushed");
+
+                        if (d3.event.selection != null) {
+
+                            var brush_coords = d3.brushSelection(this);
+
+                            // style brushed circles
+                            circles.filter(".brushed").filter(function (){
+
+                                    var cx = d3.select(this).attr("cx"),
+                                        cy = d3.select(this).attr("cy");
+
+                                    return isBrushed(brush_coords, cx, cy);
+                                })
+                                .attr("class", "brushedhours");
+                        }
+                    }
+            
+                            
+        });
+
+		//Create one label per state
+        svg.selectAll("text")
+            .data(json.features)
+            .enter()
+            .append("text")
+            .attr("text-anchor", "middle")
+            .attr("class", "boro-label")
+            .attr("x", function(d) {
+                return path.centroid(d)[0];
+            })
+            .attr("y", function(d) {
+                return path.centroid(d)[1];
+            })
+            .text(function(d) {
+                return d.properties.BoroName;
+            });
+                        
+    });
+    
+    /*
+    * If circle was selected
+    */
+    function isBrushed(brush_coords, cx, cy) {
+
+            var x0 = brush_coords[0][0],
+                x1 = brush_coords[1][0],
+                y0 = brush_coords[0][1],
+                y1 = brush_coords[1][1];
+
+        return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;
+    }
+    
+    /*
+    * Transition of the extended selection
+    */
+    function makeBrush() {
+      gBrush.transition().duration(5).call(brush.move, [mindate,new Date("01/01/2007")].map(xScale))
+        .transition().duration(500).call(brush.move, [new Date("01/01/2007"),new Date("01/01/2008")].map(xScale))
+        .transition().duration(500).call(brush.move, [new Date("01/01/2008"),new Date("01/01/2009")].map(xScale))
+        .transition().duration(500).call(brush.move, [new Date("01/01/2009"),new Date("01/01/2010")].map(xScale))
+        .transition().duration(500).call(brush.move, [new Date("01/01/2010"),new Date("01/01/2011")].map(xScale))
+        .transition().duration(500).call(brush.move, [new Date("01/01/2011"),new Date("01/01/2012")].map(xScale))
+        .transition().duration(500).call(brush.move, [new Date("01/01/2012"),new Date("01/01/2013")].map(xScale))
+        .transition().duration(500).call(brush.move, [new Date("01/01/2013"),new Date("01/01/2014")].map(xScale))
+        .transition().duration(500).call(brush.move, [new Date("01/01/2014"),new Date("01/01/2015")].map(xScale))
+        .transition().duration(500).call(brush.move, [new Date("01/01/2015"),new Date("01/01/2016")].map(xScale))
+        .transition().duration(500).call(brush.move, [new Date("01/01/2016"),new Date("01/01/2017")].map(xScale))
+        .transition().duration(500).call(brush.move, [new Date("01/01/2017"),new Date("01/01/2017")].map(xScale));
+       // gBrush.move(brush, null);
+    }
+    
+    /*
+    * Function to brush the circles if timeline selected
+    */
+    function highlightlines() {
+    
+        //if (!d3.event.sourceEvent) return; // Only transition after input.
+        if (!d3.event.selection) return; // Ignore empty selections.
+        var d0 = d3.event.selection.map(xScale.invert);
+        
+        // revert circles to initial style
+        circles.attr("class", "non_brushed");
+
+        var brush_coords = d3.brushSelection(this);
+
+        // style brushed circles
+        circles.filter(function (){
+
+                var date1 = d3.select(this).attr("date");
+
+                return comparedates(d0, date1);
+            })
+            .attr("class", "brushed")
+            .attr("style", "display:block");
+    }
+       
+    /*
+    * Function to compare dates
+    */
+    function comparedates(dateranges, date0) {
+
+            var t1 = new Date(dateranges[0]),
+                t2 = new Date(dateranges[1]);
+            
+            var date1 = new Date(date0);
+                    
+        return date1 <= t2 && date1 >= t1;
+    }
+    
+    </script>    
+    </body>
+</html>

@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Assignment 2</title>
+		<script type="text/javascript" src="../d3.js"></script>
+		<link rel="stylesheet" type="text/css" href="style.css">
+	</head>
+	<body>
+    <div class="headerContainer">
+        <h1>
+            Social Data Analysis and Visualization
+        </h1>
+        <h1 class="courseNumber">
+            02806
+        </h1>
+        <h2>
+            Assignment 2
+        </h2>
+    </div>
+
+    <div class="questionContainer">
+        <div class="part1"> 
+            <h2 style="margin-left: 20px">
+                Part 1: Telling Data Stories
+            </h2>
+            <p style="margin-left: 20px">The questions below refer to Edward Segel and Jeffrey Heer.
+                <a href="http://vis.stanford.edu/files/2010-Narrative-InfoVis.pdf">Narrative Visualization: Telling Stories with Data.</a></p>
+            <ol>
+                <h4>1. What is the Oxford English Dictionary's defintion of a narrative?</h4></li>
+                <p>
+                    The Oxford English Dictionary defines narrative as <cite>“an account of a
+                    series of events, facts, etc., given in order and with the establishing of
+                    connections between them"</cite>
+                </p>
+                <h4>2. What is your favorite visualization among the examples in section 3? Explain why in a few words.</h4></li>
+                <p>
+                    My favorite visualization is the budget vizualisation from the NY Times.<br>
+                    For one main reason, you can go through and see the forecast at any time, but you can also follow a step by step story with explanations by the NY Times. The combination of being able to navigate using the progress bar and the otherwise consistent visuals, makes the visualization very informative, while still being visually clear.  <br>
+                    You are guided in the vizualisation but still totally free to look around.
+                </p>
+                <h4>3. What's the point of Figure 7?</h4></li>
+                <p>Figure 7 gives an overview of how 58 different visualizations are made. Based on analysis the visualizations can be divided into subgroups based on which genre they are, and the “tools” used for making the narratives in the visualizations (eg. structure of the narrative and the visuals used for it)  
+
+
+            </div>
+            <div class="part2">
+
+                <h4>4. Use Figure 7 to find the most common design choice within each category for the Visual
+                    narrative and Narrative structure (the categories within visual narrative are 'visual structuring',
+                    'highlighting', etc).</h4></li>
+                <p> <u>Visual narrative:</u><br>
+                    For the visual narrative especially the <b>consistent visual platform</b> is popular as a choice for visual structuring. This choice is propably that common because it gives that “ordered and unmessy” look, even though the visualization can in fact have a lot of information. For highlighting <b>feature distinction</b> is often used while <b>object continuity</b> and <b>animated transition</b> is very popular for transition guidance.  <br><br>
+                
+
+                    <u>Narrative structure: </u><br>
+                    In ordering the narrative structure, the <b>user directed path</b> is a popular choice. For interactivity there seems to be to widely used “designs” – either the visualization is using a lot of different aids, especially <b>hover/highlighting</b> and <b>filtering</b> or they only have very <b>limited interaction. </b>
+
+                </p>
+                <h4>5. Check out Figure 8 and section 4.3. </h4></li>
+                <ul>
+                    <li style="font-weight: bold">What is your favorite genre of narrative visualization? Why? </li>
+                    <p>◦    My favorite kind of genre is the partitioned poster. For me this genre gives the most freedom to being creative, making an entertaining narrative while still having a relatively clean look. It’s easy to include different kinds of visualizations in one picture, so you can both have plain text giving information, while also adding in graphs, selections and filtering. As long as you keep the overall visualization as a consistent visual platform, it is possible to add a lot of interactivity and add in a lot of information  without cluttering the overall layout. </p>
+                    <li style="font-weight: bold">What is your least favorite genre? Why?</li>
+                    <p>◦    My least favorite genre is depending on the information that needs to be communicated. In general I’m not that fond of comic strips, as they for me seem to only work when the information is in fact something comic. That makes this genre a bit less flexible in terms of making a narrative visualization. </p>
+                </ul>
+            </ol>
+        </div> 
+    </div>
+
+    <div class="top">
+        <h2 style="margin-left: 20px">Part 2: Visualizing Murders over Time</h2>
+        <!-- Here will go the date chart-->
+    </div>
+    <div class="parent">
+        <div class="left">
+            <!-- Here will go the map-->
+        </div>
+        <div class="right">
+            <!-- Here will go the time chart-->
+        </div>
+    </div>
+
+
+
+    <script type="text/javascript">
+
+			//Width and height
+			var w = 700;
+			var h = 500;
+            var margin =60;           
+            var selectedPoints;
+            var bars;
+            var barsLabels;
+            
+            var cent = [-73.9,40.7];
+            var murderPoints;
+            
+            var allMurders= [];
+            var selectedMurders = [];
+            
+            var projection = d3.geoMercator().center(cent);
+            projection.translate([w/2,h/2]);
+            projection .scale(50000);
+            
+			//Define path generator, using the Albers USA projection
+			var path = d3.geoPath()
+				 		 .projection(projection);
+
+			//Create SVG element
+			var svg = d3.select("div.left")
+						.append("svg")
+						.attr("width", w)
+						.attr("height", h);
+            
+            var xScaleChart, yScaleChart;
+            
+            //Width and height
+			var wChart   = 1100;
+			var hChart  = 300;
+            
+            
+            
+            // Define the brush behavior
+            var brush = d3.brushX()
+                          .on("brush", selectHighlightedMurders)
+                          .on("end", updateMap); 
+            
+            
+            
+            // Create SVG for chart
+            var svgChart = d3.select("div.top")
+						.append("svg")
+						.attr("width", wChart)
+						.attr("height", hChart);
+    
+        
+            //  Time Chart
+        
+            var xScaleTimeChart, yScaleTimeChart;
+            
+            //Width and height
+			var wTimeChart   = 600;
+			var hTimeChart  = 500;
+            // Create SVG for chart
+            var svgTimeChart = d3.select("div.right")
+						.append("svg")
+						.attr("width", wTimeChart)
+						.attr("height", hTimeChart);
+                        
+        
+            
+            var murderCount = {
+                Brooklyn:0,
+                Bronx:0,
+                StatenIsland:0,
+                Manhattan:0,
+                Queens:0,
+                size:5
+            };
+            
+            var dayCount = {};
+            
+            var chart = svgChart.append("g").attr("id","chart");
+            chart.call(brush);
+
+
+
+            
+            //Create a container in which all pan-able elements will live
+			var map = svg.append("g")
+						.attr("id", "map");
+
+            
+            map.append("rect")
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", w)
+                .attr("height", h)
+                .attr("fill","white")
+                .attr("opacity", 0.3);
+
+            
+            
+            var colorScale = d3.scaleQuantize()
+                            .range(["rgb(204,221,238)", "rgb(153,187,222)",
+                            "rgb(51,120,190)", "rgb(51,120,190)", "rgb(1,87,174)"]);
+
+
+			//Load in GeoJSON data
+			d3.json("nyc.geojson", function(json) {
+
+                d3.csv("all_murder.csv",formatData, function(data) {
+                    countMurdersByDistrict(data);
+                    mergeData(murderCount,json);
+                    // use the data to create the scale domain
+                    colorScale.domain([
+                        d3.min(Object.values(murderCount), function(d) { return d; }),
+                        d3.max(Object.values(murderCount), function(d) { return d; })
+                    ]);
+                    // Create the map
+                    createPaths(json);
+                    // Add points on the map
+                    addMurderPoints(data);
+                    //Count murder each day
+                    countMurdersPerDay(data);
+                    // Create the murder date chart
+                    createChart(data);
+                    // Create the murder time chart
+                    createTimeChart(data)
+
+                });
+                
+                
+			});
+            
+
+            
+
+            
+            // Function definitions
+            function mergeData(data,json){
+                //Merge the ag. data and GeoJSON
+                //Loop through once for each ag. data value
+                for (var i = 0; i < data.size; i++) {
+                    //Grab state name
+                    var dataState = Object.keys(murderCount)[i];
+                    //Grab data value, and convert from string to float
+                    var dataValue = Object.values(murderCount)[i];
+                    //Find the corresponding state inside the GeoJSON
+                    for (var j = 0; j < json.features.length; j++) {
+                        var jsonState = json.features[j].properties.BoroName;
+                        if (dataState == jsonState) {
+                            //Copy the data value into the JSON
+                            json.features[j].properties.murderCount = dataValue;
+                            //Stop looking through the JSON
+                            break;
+                        }else if (jsonState == "Staten Island" & dataState=="StatenIsland"){
+                            //Copy the data value into the JSON
+                            json.features[j].properties.murderCount = dataValue;
+                            //Stop looking through the JSON
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            function addMurderPoints(murdersData){
+                allMurders = murdersData;
+                selectedMurders =  murdersData;
+                murderPoints = map.selectAll("circle")
+                    .data(selectedMurders)
+                    .enter()
+                    .append("circle")
+                    .attr("cx", function(d) {
+                        return projection([d.Longitude, d.Latitude])[0];
+                    })
+                    .attr("cy", function(d) {
+                        return projection([d.Longitude, d.Latitude])[1];
+                    })
+                    .style("stroke", "black")
+                    .style("fill","#ff9933")
+                    .style("opacity",0.7)
+                    .style("stroke-width", 0.5)
+                    .attr("r", 2);
+            }
+            
+            function createPaths(json){
+                //Bind data and create one path per GeoJSON feature
+				map.selectAll("path")
+                   .data(json.features)
+                   .enter()
+                   .append("path")
+                   .attr("d", path)
+                    .style("fill", function(d){
+                        if (d.properties.murderCount) {
+                            //If value exists...
+                            return colorScale(d.properties.murderCount);
+                        } else {
+                            //If value is undefined...
+                            return "#ccc";
+                        }
+                    })
+                    .style("stroke","black")
+                    .style("stroke-width",1)
+                    .append("title")
+                        .classed("tooltip", true)
+                        .text(function(d) { 
+                            return d.properties.BoroName; 
+                    });
+
+                map.selectAll("text")
+                    .data(json.features)
+                    .enter()
+                    .append("text")
+                    .style('fill', 'black')
+                    .attr("stroke", "black")
+                    .attr("stroke-width", "0.1")
+                    .attr("font-family", "sans-serif")
+                    .attr("x", function (d) {
+                        return path.centroid(d)[0] - 30;
+                    })
+                    .attr("y", function (d) {
+                        return path.centroid(d)[1];
+                    })
+                    .text(function (d) {
+                        return d.properties.BoroName;
+                    })
+                    .attr("class", "boroNames");
+                
+            }
+            
+            
+
+            function countMurdersByDistrict(data){
+                data.forEach(function(e){
+                    switch(e.BORO_NM){
+                        case "BROOKLYN":
+                            murderCount.Brooklyn ++;
+                            break;
+                        case "BRONX":
+                            murderCount.Bronx ++;
+                            break;
+                        case "STATEN ISLAND":
+                            murderCount.StatenIsland ++;
+                            break;
+                        case "MANHATTAN":
+                            murderCount.Manhattan ++;
+                            break;
+                        case "QUEENS":
+                            murderCount.Queens ++;
+                            break;      
+                    }
+                    
+                    
+                });
+            }
+            
+            var dateParse  = d3.timeParse("%m/%d/%Y");
+            var hourParse = d3.timeParse("%H:%M:%S");
+            
+            function formatData(d){
+                    return {
+                        Date: dateParse(d.RPT_DT),
+                        Hour: +d.CMPLNT_FR_TM,
+                        BORO_NM: d.BORO_NM,
+                        Latitude: d.Latitude,
+                        Longitude: d.Longitude
+                    };
+                }
+            
+            function sortDataInBuckets(d){
+                   var sortedHours = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+                   d.forEach(function(d){
+                       sortedHours[d.Hour] +=1;
+                       
+                   });
+                    return sortedHours;
+            }
+            function sortByDateAscending(a, b) {
+                // Dates will be cast to numbers automagically:
+                    return a.date- b.date;
+                }
+            function createChart(data){
+                
+                // data is in dayCount
+                dayCount = dayCount.sort(sortByDateAscending);
+                
+                xScaleChart = d3.scaleTime()
+                                .domain([
+                                d3.min(dayCount, function(d){
+                                    return d3.isoParse(d.key);}),
+                                d3.max(dayCount, function(d){return d3.isoParse(d.key);})])
+                                .rangeRound([margin, wChart]);
+
+                yScaleChart = d3.scaleLinear()
+                                .domain([0, d3.max(dayCount, function(d){return d.count;})])
+                                .range([ hChart-margin-2,margin]);
+                
+                var lineGenerator = d3.line()
+                                .x(function(d) { return xScaleChart(d3.isoParse(d.key)); })
+                                .y(function(d) { return yScaleChart(d.count); });
+
+                
+                //Create line
+                chart.append("path")
+                    .datum(dayCount)
+                    .attr("class", "line invisibleToMouse")
+                    .attr("d", lineGenerator)
+                
+                                
+                // create axis
+                var xAxis = d3.axisBottom().scale(xScaleChart).tickArguments([d3.timeYear.every(1)]);;
+                chart.append("g").attr("class", "xaxis")
+                    .attr("transform", "translate(0," + (hChart - margin) + ")")
+                    .call(xAxis);
+
+                var yAxis = d3.axisLeft().scale(yScaleChart).tickFormat(d3.format(",.0f"));
+                chart.append("g")
+                    .attr("class", "yaxis")
+                    .attr("transform", "translate(" + margin + ",0)")
+                    .call(yAxis);
+                
+                // create Xaxis titles
+                svgChart.append("text")
+                    .attr("class", "x label")
+                    .attr("text-anchor", "middle")
+                    .attr("y",hChart-15).attr("x",wChart/2)
+                    .text("date")
+                    .attr("font-family", "sans-serif")
+                   .attr("font-size", "14px");
+                // create Yaxis titles
+                svgChart.append("text")
+                    .attr("class", "y label")
+                    .attr("text-anchor", "middle")
+                    .attr("x", -hChart/2)
+                    .attr("y", 10)
+                    .attr("dy", ".75em")
+                    .attr("transform", "rotate(-90)")
+                    .text("number of murders")
+                    .attr("font-family", "sans-serif")
+                   .attr("font-size", "14px");
+
+                
+            
+                // create GRaph Title
+                svgChart.append("text").attr("class","graphName")
+                    .text("NYC murders in between 2005 and 2016").attr("y",20).attr("x",wChart/2).attr("text-anchor", "middle")
+                    .attr("font-family", "sans-serif")
+                   .attr("font-size", "18px")
+                   .attr("fill", "black");
+                
+                
+            }
+            
+            function selectHighlightedMurders(){
+
+                if (d3.event.selection != null) {
+                    // revert circles to initial style
+
+                    var brush_coords = d3.brushSelection(this);
+                    var x0 = brush_coords[0],
+                        x1 = brush_coords[1];
+
+                    var date_start = xScaleChart.invert(x0);
+                    var date_end = xScaleChart.invert(x1);
+                    
+
+                    // style brushed circles
+                    selectedMurders = allMurders.filter(function (d){
+                            var date = d.Date;
+                            return date>=date_start & date<date_end;
+                        });
+                    if (selectedMurders.length==0){
+                        selectedMurders = allMurders;
+                    }
+                }else{
+                    console.log('not selected')
+                    selectedMurders = allMurders;
+                }
+                
+            }
+            
+            
+            function updateMap(){
+                if (selectedMurders.length==0){
+                    selectedMurders = allMurders;
+                }
+
+                console.log('end');
+                if (!d3.event.selection) {
+                    selectedMurders = allMurders;
+                    console.log('There is no selection');
+                    map.selectAll("circle").remove();
+
+                    map.selectAll("circle")
+                        .data(selectedMurders)
+                        .enter()
+                        .append("circle")
+                        .attr("cx", function(d) {
+                            return projection([d.Longitude, d.Latitude])[0];
+                        })
+                        .attr("cy", function(d) {
+                            return projection([d.Longitude, d.Latitude])[1];
+                        })
+                        .style("stroke", "black")
+                        .style("fill","#ff9933")
+                        .style("opacity",0.7)
+                        .style("stroke-width", 0.5)
+                        .attr("r", 2);
+                }
+
+                map.selectAll("circle").remove();
+                
+                map.selectAll("circle")
+                    .data(selectedMurders)
+                    .enter()
+                    .append("circle")
+                    .attr("cx", function(d) {
+                        return projection([d.Longitude, d.Latitude])[0];
+                    })
+                    .attr("cy", function(d) {
+                        return projection([d.Longitude, d.Latitude])[1];
+                    })
+                    .style("stroke", "black")
+                    .style("fill","#ff9933")
+                    .style("opacity",0.7)
+                    .style("stroke-width", 0.5)
+                    .attr("r", 2);
+                
+                
+                // Also update the time distribution chart
+                updateTimeChart();
+            }
+            
+            
+            function countMurdersPerDay(data){
+                dayCount = d3.nest().key(function(d){
+                                         return d.Date;
+                }).entries(data)
+                dayCount.forEach(function(d){
+                    d.date = d3.isoParse(d.key);
+                    d.count = d.values.length;
+                });
+            }
+        
+        
+        
+        
+        
+        
+        // Time chart
+            function createTimeChart(data){
+                var hoursBuckets = sortDataInBuckets(selectedMurders);
+
+                xScaleTimeChart = d3.scaleBand()
+                                .domain(d3.range(24))
+                                .rangeRound([0, wTimeChart-2*margin])
+                                .paddingInner(0.06);
+
+                yScaleTimeChart = d3.scaleLinear()
+                                .domain([0, d3.max(hoursBuckets)])
+                                .range([ hTimeChart-margin-2,margin]);
+                
+                //Create bars
+                bars = svgTimeChart.selectAll("rect")
+                   .data(hoursBuckets)
+                   .enter()
+                   .append("rect")
+                   .attr("x", function(d, i) {
+                        return margin+xScaleTimeChart(i);
+                   })
+                   .attr("y", function(d) {
+                        return yScaleTimeChart(d);
+                   })
+                   .attr("width", xScaleTimeChart.bandwidth())
+                   .attr("height", function(d) {
+                        return hTimeChart- yScaleTimeChart(d)-margin;
+                   })
+                   .attr("fill", function(d) {
+                        return "rgb(51,120,190)";
+                   });
+
+
+                
+                //Create labels
+                barsLabels = svgTimeChart.selectAll("text")
+                   .data(hoursBuckets)
+                   .enter()
+                   .append("text")
+                   .attr("class", "labels")
+                   .text(function(d) {
+                        return d;
+                   })
+                   .attr("text-anchor", "middle")
+                   .attr("x", function(d, i) {
+                        return margin+ xScaleTimeChart(i) + xScaleTimeChart.bandwidth() / 2;
+                   })
+                   .attr("y", function(d) {
+                        if(d <1 ){
+                            return yScaleTimeChart(d) - 8;
+                        }
+                        return yScaleTimeChart(d) + 20;
+                   })
+                   .attr("font-family", "sans-serif")
+                   .attr("font-size", "12px")
+                   .attr("fill", function(d){
+                        if(d <1 ){
+                                return "black";
+                            }
+                        return "white";
+                    });
+                
+                                
+                // create axis
+                var xAxisHour = d3.axisBottom().scale(xScaleTimeChart).ticks(24);
+                svgTimeChart.append("g").attr("class", "xaxis")
+                    .attr("transform", "translate("+margin+"," + (hTimeChart - margin) + ")")
+                    .call(xAxisHour);
+
+                var yAxisHour = d3.axisLeft().scale(yScaleTimeChart).tickFormat(d3.format(",.0f"));
+                svgTimeChart.append("g")
+                    .attr("class", "yaxis")
+                    .attr("transform", "translate(" + margin + ",0)")
+                    .call(yAxisHour);
+                
+                // create Xaxis titles
+                svgTimeChart.append("text")
+                    .attr("class", "x label")
+                    .attr("text-anchor", "middle")
+                    .attr("y",hTimeChart-15).attr("x",wTimeChart/2)
+                    .text("hour of the day")
+                    .attr("font-family", "sans-serif")
+                   .attr("font-size", "14px");
+                // create Yaxis titles
+                svgTimeChart.append("text")
+                    .attr("class", "y label")
+                    .attr("text-anchor", "middle")
+                    .attr("x", -hTimeChart/2)
+                    .attr("y", 10)
+                    .attr("dy", ".75em")
+                    .attr("transform", "rotate(-90)")
+                    .text("number of murders")
+                    .attr("font-family", "sans-serif")
+                   .attr("font-size", "14px");
+
+                
+            
+                // create GRaph Title
+                svgTimeChart.append("text").attr("class","graphName")
+                    .text("Murder time distribution during the selected period").attr("y",20).attr("x",wTimeChart/2).attr("text-anchor", "middle")
+                    .attr("font-family", "sans-serif")
+                   .attr("font-size", "18px")
+                   .attr("fill", "black");        
+            }
+            function updateTimeChart(){
+                var sortedHours = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+                   selectedMurders.forEach(function(d){
+                       sortedHours[d.Hour] +=1;
+                   });
+                // Remove old data               
+                bars.data([]).exit().transition().duration(500).ease(d3.easeLinear).attr("y",hTimeChart-margin).attr("height","0").remove();
+               
+                var maxMurders = d3.max(sortedHours, function(d){
+                                    return d;
+                                });
+                yScaleTimeChart.domain([0, d3.max([maxMurders,6])]);
+                
+                
+                bars.data(sortedHours)
+                   .enter()
+                   .append("rect")
+                   .attr("x", function(d, i) {
+                        return margin+xScaleTimeChart(i);
+                   })
+                   .attr("y", function(d) {
+                        return hTimeChart-margin;
+                   })
+                   .attr("width", xScaleTimeChart.bandwidth())
+                   .attr("height",0)
+                   .attr("fill", function(d) {
+                        return "rgb(51,120,190)";
+                   }).merge(bars).transition().duration(500).ease(d3.easeLinear)
+                    .attr("y", function(d) {
+                        return yScaleTimeChart(d);
+                   }).attr("height", function(d) {
+                        return hTimeChart- yScaleTimeChart(d)-margin;
+                   });
+                
+                // Recreate the Y Axis
+                svgTimeChart.selectAll("g.yaxis").remove();
+            
+                var yAxis = d3.axisLeft().scale(yScaleTimeChart).ticks(5).tickFormat(d3.format(",.0f"));
+                svgTimeChart.append("g")
+                    .attr("class", "yaxis")
+                    .attr("transform", "translate(" + margin + ",0)")
+                    .call(yAxis);
+                
+                // Recreate the labels
+                barsLabels.data(sortedHours).transition().duration(500).ease(d3.easeLinear)
+                   .text(function(d) {
+                        return d;
+                   }).attr("y", function(d) {
+                        if(d <1 ){
+                            return yScaleTimeChart(d) - 8;
+                        }
+                        return yScaleTimeChart(d) + 20;
+                   }).attr("fill", function(d){
+                        if(d <1 ){
+                                return "black";
+                            }
+                        return "white";
+                    });
+                
+            }
+            
+            
+			
+		</script>
+	</body>
+</html>
