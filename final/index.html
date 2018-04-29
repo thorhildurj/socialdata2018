@@ -76,14 +76,13 @@
 
         <script type="text/javascript">
         //Width and height
-        var w = 600;
-        var h = 600;
+        var wMap = 600;
+        var hMap = 600;
 
-  			//need to lower the translate as we set scale to higher value to make it bigger the map
+  			//Note: You need to lower the translate and make scale higher to make it a bigger map
         var projection = d3.geoMercator()
-                           .translate([w/0.01087, h/0.01795])
+                           .translate([wMap/0.01087, hMap/0.01795])
                            .scale([42500]);
-
 
   			//Define path generator
   			var path = d3.geoPath()
@@ -97,8 +96,8 @@
   			//Create SVG element
   			var svg = d3.select("#geoMap")
         						.append("svg")
-        						.attr("width", w)
-        						.attr("height", h);
+        						.attr("width", wMap)
+        						.attr("height", hMap);
 
         //Load in taxi data
   			d3.csv("zones.csv", function(data) {
@@ -106,20 +105,18 @@
           //Set input domain for color scale, harð-kóðaði inn gildin á zones
           color.domain([
             d3.min([0]),
-            //d3.max(data, function(d) { return d.value; })
+            //d3.max(data, function(d) {return d.location_id; })
             d3.max([265])
           ]);
 
           //Load in GeoJSON data
     			d3.json("taxizones.json", function(json) {
 
-
             //Merge the taxi data and GeoJSON. Loop through once for each taxi data value
             for (var i = 0; i < data.length; i++) {
 
               //Lets grap the name of the zone
               var dataZone = data[i].zone;
-
               //Grab data value, that is the id of the zone, and convert from string to float
               var dataValue = parseFloat(data[i].location_id);
 
@@ -127,12 +124,9 @@
               for (var j = 0; j < json.features.length; j++) {
 
                 var jsonZone = json.features[j].properties.zone;
-
                 if (dataZone == jsonZone) {
-                  console.log("state er það sama", dataZone, dataValue);
-
-                  //Copy the data value into the JSON, þarf þetta því að við erum með location id í json-inu fyrir: properties.locationid ???
-                  json.features[j].properties.value = dataValue;
+                  //Copy the data value into the JSON, þarf þetta því að við erum með location id í json-inu fyrir
+                  json.features[j].properties.locationid = dataValue;
 
                   //Stop looking through the JSON
                   break;
@@ -140,9 +134,7 @@
                 }
               }
             }
-
             //"properties":{"objectid":3,"shape_leng":0.0843411059,"shape_area":0.00031441416,"zone":"Allerton/Pelham Gardens","locationid":3,"borough":"Bronx"}},
-
     				//Bind data and create one path per GeoJSON feature
     				svg.selectAll("path")
     				   .data(json.features)
@@ -150,14 +142,14 @@
     				   .append("path")
     				   .attr("d", path)
                .style("fill", function(d) {
-                  //Get data value, gæti gert hér bara frekar properties.locationid ???
-                  var value = d.properties.value;
+                  //Get data value
+                  var value = d.properties.locationid;
 
                   if (value) {
-                    //If value exists…
+                    //If value exists
                     return color(value);
                   } else {
-                    //If value is undefined…
+                    //If value is undefined
                     return "#ccc";
                   }
                });
