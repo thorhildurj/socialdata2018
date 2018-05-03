@@ -78,12 +78,12 @@
           <p>
             We analyzed data for NYC taxi trips and we will show our findings here.
 
-            <div class="website-container" id="geoMap">
+            <div id="geoMap">
               <h3>Here is geoMap</h3>
             </div>
 
-            <div class="website-container" id="barChart">
-              <h3>Here is a barchart</h3>
+            <div class="website-container">
+              <div id="hours_chart1"></div>
             </div>
 
 
@@ -186,90 +186,134 @@
            });
 
 
-//- - - - - - - - - - - - - - Creating a bar-chart - - - - - -- - - - - - - - - -
-          d3.csv("passengerCount_all17.csv", function(taxiData) {
-            wBar = 500;
-            hBar = 500;
-            xPaddingBar = 40;
-            yPaddingBar = 75;
+
+
+
+
+          /***************************************************************
+          *****                 Barcharts with hours                 *****
+          ****************************************************************/
+
+
+          function make_y_axis(scale, svg) {
+            return d3.axisLeft()
+                      .scale(scale)
+                      .ticks(5);
+          }
+          // Next we declare some usefule variables
+          var possibleHours = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
+          var widthHoursChart = 900;
+          var heightHoursChart = 350;
+          var xScaleHoursChart, yScaleHoursChart, svgHoursChart, xAxisHoursChart, yAxisHoursChart;
+          var paddingHoursChart = 40;
+
+          var rowHoursConverter = function(d) {
+            return {
+              hours: parseInt(d.hours),
+              num: parseInt(d.num),
+            };
+          }
+
+
+          d3.csv("data/hours_number_only.csv", rowHoursConverter, function(data) {
+
+            var dataset = data;
 
             // lets create the scales
-            var xScaleBar = d3.scaleBand()
-                          .domain(d3.range(taxiData.length))
-                          .rangeRound([xPaddingBar, wBar])  // 'rangeRound' enables rounding
-                          .paddingInner(0.1);
+            xScaleHoursChart = d3.scaleBand()
+              .domain(possibleHours)
+              .rangeRound([paddingHoursChart * 2, widthHoursChart])  // 'rangeRound' enables rounding | double padding to make room for the numbers
+              .paddingInner(0.2);
 
-            var yScaleBar = d3.scaleLinear()
-                          .domain([0, d3.max(taxiData, function(d) { return d.num; })])
-                          .range([hBar - yPaddingBar, yPaddingBar * 2]); // double padding on the top to have room for title
+            yScaleHoursChart = d3.scaleLinear()
+              .domain([0, d3.max(dataset, function(d) { return d.num; })])
+              .range([heightHoursChart - paddingHoursChart, paddingHoursChart * 2]); // double padding on the top to have room for title
 
             //Create SVG element
-             var svgBar = d3.select("#barChart")
+            svgHoursChart = d3.select("#hours_chart1")
                     .append("svg")
-                    .attr("width", wBar)
-                    .attr("height", hBar);
+                    .attr("width", widthHoursChart)
+                    .attr("height", heightHoursChart);
+
+            // Setting chart lines (really long ticks)
+            svgHoursChart.append("g")
+               .call(make_y_axis(yScaleHoursChart, svgHoursChart)
+                      .tickSize(-widthHoursChart, 0, 0)
+                      .tickFormat("")
+               )
+               .attr("transform", "translate(" + paddingHoursChart * 2 + ",0)");
 
             //Create bars
-            svgBar.selectAll("rect")
-               .data(taxiData)
+            svgHoursChart.selectAll("rect")
+               .data(dataset)
                .enter()
                .append("rect")
-               .attr("x", function(d) {
-                  return xScaleBar(d.passenger_count);  // Setting x values
+               .attr("x", function(d, i) {
+                  return xScaleHoursChart(d.hours);  // Setting x values
                })
                .attr("y", function(d) {
-                  return yScaleBar(d.num);
+                  return yScaleHoursChart(d.num);
                })
-               .attr("width", xScaleBar.bandwidth())
+               .attr("width", xScaleHoursChart.bandwidth())
                .attr("height", function(d) {
-                  return hBar - yScaleBar(d.num) - yPaddingBar;
+                  return heightHoursChart - yScaleHoursChart(d.num) - paddingHoursChart;
                })
-               .attr("fill", "#25b898");
+               .attr("fill", function(d) {
+                 return "#25b898"
+               });
 
              // Define X axis
-             var xAxisBar = d3.axisBottom()
-                 .scale(xScaleBar);
+             xAxisHoursChart = d3.axisBottom()
+                 .scale(xScaleHoursChart)
+                 .tickValues(possibleHours);
 
              //Define Y axis
-             var yAxisBar = d3.axisLeft()
-                       .scale(yScaleBar)
+             yAxisHoursChart = d3.axisLeft()
+                       .scale(yScaleHoursChart)
                        .ticks(5);
 
              //Create X axis
-             svgBar.append("g")
+             svgHoursChart.append("g")
                 .attr("class", "x axis")
-                .attr("transform", "translate(0," + (hBar - yPaddingBar) + ")")
-                .call(xAxisBar);
+                .attr("transform", "translate(0," + (heightHoursChart - paddingHoursChart) + ")")
+                .call(xAxisHoursChart);
 
              //Create Y axis
-             svgBar.append("g")
+             svgHoursChart.append("g")
                .attr("class", "y axis")
-               .attr("transform", "translate(" + yPaddingBar + ",0)")
-               .call(yAxisBar);
+               .attr("transform", "translate(" + paddingHoursChart * 2 + ",0)") // double padding to make room for the numbers
+               .call(yAxisHoursChart);
 
+             // Setting y label
+             svgHoursChart.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0)
+                .attr("x",0 - (heightHoursChart / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .style("font-weight", "bolder")
+                .style("font-size", "10px")
+                .text("# of taxi trips");
 
-               // Setting y label
-               svgBar.append("text")
-                  .attr("transform", "rotate(-90)")
-                  .attr("y", -3)
-                  .attr("x",0 - (hBar/1.8))
-                  .attr("dy", "1em")
-                  .style("text-anchor", "middle")
-                  .style("font-weight", "bolder")
-                  .style("font-size", "11px")
-                  .text("Amount of taxi rides");
+            // Setting x label
+            svgHoursChart.append("text")
+               .attr("y", heightHoursChart - 15)
+               .attr("x", (widthHoursChart / 2))
+               .attr("dy", "1em")
+               .style("text-anchor", "middle")
+               .style("font-weight", "bolder")
+               .style("font-size", "10px")
+               .text("Hour");
 
-              // Setting x label
-              svgBar.append("text")
-                 .attr("y", hBar - 45)
-                 .attr("x", (wBar / 2))
-                 .attr("dy", "1em")
-                 .style("text-anchor", "middle")
-                 .style("font-weight", "bolder")
-                 .style("font-size", "11px")
-                 .text("Amount of passengers in each ride");
-
-          })
+             // Setting the title
+             svgHoursChart.append("text")
+                .attr("x", widthHoursChart / 2)
+                .attr("y", paddingHoursChart) // we want little bit of padding from the top
+                .attr("text-anchor", "middle")
+                .style("font-size", "19px")
+                .style("font-weight", "bolder")
+                .text("Pickup Hour");
+        });
 
 
 
