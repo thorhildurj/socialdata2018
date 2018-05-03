@@ -118,139 +118,138 @@
   						       .projection(projection);
 
         //Define quantize scale to sort data values into buckets of color
-        var color = d3.scaleQuantize()
+        var colorMap = d3.scaleQuantize()
                       .range(["rgb(237,248,233)","rgb(186,228,179)","rgb(116,196,118)","rgb(49,163,84)","rgb(0,109,44)"]);
 
 
   			//Create SVG element
-  			var svg = d3.select("#geoMap")
+  			var svgMap = d3.select("#geoMap")
         						.append("svg")
         						.attr("width", wMap)
         						.attr("height", hMap);
 
-        //Load in taxi data
-  			d3.csv("zones.csv", function(data) {
+        //Load in taxi zonedata
+  			d3.csv("zones.csv", function(zoneData) {
+          d3.csv("zones_passengers_all17.csv", function(zonePassengerData){
 
-          //Set input domain for color scale, harð-kóðaði inn gildin á zones
-          color.domain([
-            d3.min([0]),
-            //d3.max(data, function(d) {return d.location_id; })
-            d3.max([265])
-          ]);
+            //Set input domain for color scale, harð-kóðaði inn gildin á zones
+            colorMap.domain([
+              d3.min([0]),
+              //d3.max(data, function(d) {return d.location_id; })
+              d3.max([265])
+            ]);
 
-          //Load in GeoJSON data
-    			d3.json("taxizones.json", function(json) {
+            //Load in GeoJSON data
+      			d3.json("taxizones.json", function(json) {
 
-            //Merge the taxi data and GeoJSON. Loop through once for each taxi data value
-            for (var i = 0; i < data.length; i++) {
+              //Merge the taxi data and GeoJSON. Loop through once for each taxi data value
+              for (var i = 0; i < zoneData.length; i++) {
 
-              //Lets grap the name of the zone
-              var dataZone = data[i].zone;
-              //Grab data value, that is the id of the zone, and convert from string to float
-              var dataValue = parseFloat(data[i].location_id);
+                //Lets grap the name of the zone
+                var dataZone = zoneData[i].zone;
+                //Grab data value, that is the id of the zone, and convert from string to float
+                var dataValue = parseFloat(zoneData[i].location_id);
 
-              //Find the corresponding state inside the GeoJSON
-              for (var j = 0; j < json.features.length; j++) {
+                //Find the corresponding state inside the GeoJSON
+                for (var j = 0; j < json.features.length; j++) {
 
-                var jsonZone = json.features[j].properties.zone;
-                if (dataZone == jsonZone) {
-                  //Copy the data value into the JSON, þarf þetta því að við erum með location id í json-inu fyrir
-                  json.features[j].properties.locationid = dataValue;
-
-                  //Stop looking through the JSON
-                  break;
-
+                  var jsonZone = json.features[j].properties.zone;
+                  if (dataZone == jsonZone) {
+                    //Copy the data value into the JSON, þarf þetta því að við erum með location id í json-inu fyrir
+                    json.features[j].properties.locationid = dataValue;
+                    //Stop looking through the JSON
+                    break;
+                  }
                 }
               }
-            }
-            //"properties":{"objectid":3,"shape_leng":0.0843411059,"shape_area":0.00031441416,"zone":"Allerton/Pelham Gardens","locationid":3,"borough":"Bronx"}},
-    				//Bind data and create one path per GeoJSON feature
-    				svg.selectAll("path")
-    				   .data(json.features)
-    				   .enter()
-    				   .append("path")
-    				   .attr("d", path)
-               .style("fill", function(d) {
-                  //Get data value
-                  var value = d.properties.locationid;
+              //"properties":{"objectid":3,"shape_leng":0.0843411059,"shape_area":0.00031441416,"zone":"Allerton/Pelham Gardens","locationid":3,"borough":"Bronx"}},
+      				//Bind data and create one path per GeoJSON feature
+      				svgMap.selectAll("path")
+      				   .data(json.features)
+      				   .enter()
+      				   .append("path")
+      				   .attr("d", path)
+                 .style("fill", function(d) {
+                    //Get data value
+                    var value = d.properties.locationid;
 
-                  if (value) {
-                    //If value exists
-                    return color(value);
-                  } else {
-                    //If value is undefined
-                    return "#ccc";
-                  }
-               });
-    			});
+                    if (value) {
+                      //If value exists
+                      return colorMap(value);
+                    } else {
+                      //If value is undefined
+                      return "#ccc";
+                    }
+                 });
+      			   });
+             });
+           });
+
 
 //- - - - - - - - - - - - - - Creating a bar-chart - - - - - -- - - - - - - - - -
           d3.csv("passengerCount_all17.csv", function(taxiData) {
             wBar = 500;
             hBar = 500;
-            xpadding = 40;
-            ypadding = 75;
-
-            console.log(taxiData)
+            xPaddingBar = 40;
+            yPaddingBar = 75;
 
             // lets create the scales
-            var xScale = d3.scaleBand()
+            var xScaleBar = d3.scaleBand()
                           .domain(d3.range(taxiData.length))
-                          .rangeRound([xpadding, wBar])  // 'rangeRound' enables rounding
+                          .rangeRound([xPaddingBar, wBar])  // 'rangeRound' enables rounding
                           .paddingInner(0.1);
 
-            var yScale = d3.scaleLinear()
+            var yScaleBar = d3.scaleLinear()
                           .domain([0, d3.max(taxiData, function(d) { return d.num; })])
-                          .range([hBar - ypadding, ypadding * 2]); // double padding on the top to have room for title
+                          .range([hBar - yPaddingBar, yPaddingBar * 2]); // double padding on the top to have room for title
 
             //Create SVG element
-             var svg = d3.select("#barChart")
+             var svgBar = d3.select("#barChart")
                     .append("svg")
                     .attr("width", wBar)
                     .attr("height", hBar);
 
             //Create bars
-            svg.selectAll("rect")
+            svgBar.selectAll("rect")
                .data(taxiData)
                .enter()
                .append("rect")
                .attr("x", function(d) {
-                 console.log(d.passenger_count);
-                  return xScale(d.passenger_count);  // Setting x values
+                  return xScaleBar(d.passenger_count);  // Setting x values
                })
                .attr("y", function(d) {
-                  return yScale(d.num);
+                  return yScaleBar(d.num);
                })
-               .attr("width", xScale.bandwidth())
+               .attr("width", xScaleBar.bandwidth())
                .attr("height", function(d) {
-                  return hBar - yScale(d.num) - ypadding;
+                  return hBar - yScaleBar(d.num) - yPaddingBar;
                })
                .attr("fill", "#25b898");
 
              // Define X axis
-             var xAxis = d3.axisBottom()
-                 .scale(xScale);
+             var xAxisBar = d3.axisBottom()
+                 .scale(xScaleBar);
 
              //Define Y axis
-             var yAxis = d3.axisLeft()
-                       .scale(yScale)
+             var yAxisBar = d3.axisLeft()
+                       .scale(yScaleBar)
                        .ticks(5);
 
              //Create X axis
-             svg.append("g")
+             svgBar.append("g")
                 .attr("class", "x axis")
-                .attr("transform", "translate(0," + (hBar - ypadding) + ")")
-                .call(xAxis);
+                .attr("transform", "translate(0," + (hBar - yPaddingBar) + ")")
+                .call(xAxisBar);
 
              //Create Y axis
-             svg.append("g")
+             svgBar.append("g")
                .attr("class", "y axis")
-               .attr("transform", "translate(" + ypadding + ",0)")
-               .call(yAxis);
+               .attr("transform", "translate(" + yPaddingBar + ",0)")
+               .call(yAxisBar);
 
 
                // Setting y label
-               svg.append("text")
+               svgBar.append("text")
                   .attr("transform", "rotate(-90)")
                   .attr("y", -3)
                   .attr("x",0 - (hBar/1.8))
@@ -261,7 +260,7 @@
                   .text("Amount of taxi rides");
 
               // Setting x label
-              svg.append("text")
+              svgBar.append("text")
                  .attr("y", hBar - 45)
                  .attr("x", (wBar / 2))
                  .attr("dy", "1em")
@@ -272,7 +271,7 @@
 
           })
 
-        })
+
 
 
 
