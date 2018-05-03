@@ -206,6 +206,7 @@
           var heightHoursChart = 350;
           var xScaleHoursChart, yScaleHoursChart, svgHoursChart, xAxisHoursChart, yAxisHoursChart;
           var paddingHoursChart = 40;
+          var brushhour
 
           var rowHoursConverter = function(d) {
             return {
@@ -313,7 +314,46 @@
                 .style("font-size", "19px")
                 .style("font-weight", "bolder")
                 .text("Pickup Hour");
+
+            // setting the brush
+            brushHour = d3.brushX()
+                    .extent([[paddingHoursChart * 2, paddingHoursChart * 2], [widthHoursChart, heightHoursChart - paddingHoursChart]])
+                    .on("brush", highlightBrushedHour);
+                    // .on("end", onBrushEnd);
+
+            svgHoursChart.append("g")
+                         .call(brushHour);
         });
+
+
+        function highlightBrushedHour() {
+             if (d3.event.selection != null) {
+
+//               var extent = d3.event.selection.map(xScale.invert, xScale);
+//
+//               // extract left and right edge date information from the extent
+//               var leftTime = extent[0].getTime();
+//               var rightTime = extent[1].getTime();
+//               var leftTimeDate = new Date(leftTime);
+//               var rightTimeDate = new Date(rightTime);
+//
+//               // create new data array with the selected data
+//               var selectedData = [];
+//               for (var i = 0; i < murderData.length; i++) {
+//                 if (murderData[i].date > leftTimeDate && murderData[i].date < rightTimeDate) {
+//                   selectedData.push(murderData[i])
+//                 }
+//               }
+//
+//               // if no data is selected we show the whole dataset
+//               if (selectedData.length == 0) {
+//                 selectedData = murderData;
+//               }
+//
+//               // update map with selected data
+//               updateMapWithSelectedData(selectedData);
+             }
+         }
 
 
 
