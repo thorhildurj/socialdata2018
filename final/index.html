@@ -3,7 +3,7 @@
     <head>
         <link href="https://fonts.googleapis.com/css?family=Nunito:200" rel="stylesheet">
         <meta charset="utf-8">
-        <title>Assignment 1</title>
+        <title>New York City taxi data</title>
         <script type="text/javascript" src="./d3.js"></script>
         <style>
             body {
@@ -78,10 +78,14 @@
           <p>
             We analyzed data for NYC taxi trips and we will show our findings here.
 
-            <div id="geoMap">
+            <div class="website-container" id="geoMap">
               <h3>Here is geoMap</h3>
-
             </div>
+
+            <div class="website-container" id="barChart">
+              <h3>Here is a barchart</h3>
+            </div>
+
 
             <br />
             <br />
@@ -179,6 +183,94 @@
                   }
                });
     			});
+
+//- - - - - - - - - - - - - - Creating a bar-chart - - - - - -- - - - - - - - - -
+          d3.csv("passengerCount_all17.csv", function(taxiData) {
+            wBar = 500;
+            hBar = 500;
+            xpadding = 40;
+            ypadding = 75;
+
+            console.log(taxiData)
+
+            // lets create the scales
+            var xScale = d3.scaleBand()
+                          .domain(d3.range(taxiData.length))
+                          .rangeRound([xpadding, wBar])  // 'rangeRound' enables rounding
+                          .paddingInner(0.1);
+
+            var yScale = d3.scaleLinear()
+                          .domain([0, d3.max(taxiData, function(d) { return d.num; })])
+                          .range([hBar - ypadding, ypadding * 2]); // double padding on the top to have room for title
+
+            //Create SVG element
+             var svg = d3.select("#barChart")
+                    .append("svg")
+                    .attr("width", wBar)
+                    .attr("height", hBar);
+
+            //Create bars
+            svg.selectAll("rect")
+               .data(taxiData)
+               .enter()
+               .append("rect")
+               .attr("x", function(d) {
+                 console.log(d.passenger_count);
+                  return xScale(d.passenger_count);  // Setting x values
+               })
+               .attr("y", function(d) {
+                  return yScale(d.num);
+               })
+               .attr("width", xScale.bandwidth())
+               .attr("height", function(d) {
+                  return hBar - yScale(d.num) - ypadding;
+               })
+               .attr("fill", "#25b898");
+
+             // Define X axis
+             var xAxis = d3.axisBottom()
+                 .scale(xScale);
+
+             //Define Y axis
+             var yAxis = d3.axisLeft()
+                       .scale(yScale)
+                       .ticks(5);
+
+             //Create X axis
+             svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + (hBar - ypadding) + ")")
+                .call(xAxis);
+
+             //Create Y axis
+             svg.append("g")
+               .attr("class", "y axis")
+               .attr("transform", "translate(" + ypadding + ",0)")
+               .call(yAxis);
+
+
+               // Setting y label
+               svg.append("text")
+                  .attr("transform", "rotate(-90)")
+                  .attr("y", -3)
+                  .attr("x",0 - (hBar/1.8))
+                  .attr("dy", "1em")
+                  .style("text-anchor", "middle")
+                  .style("font-weight", "bolder")
+                  .style("font-size", "11px")
+                  .text("Amount of taxi rides");
+
+              // Setting x label
+              svg.append("text")
+                 .attr("y", hBar - 45)
+                 .attr("x", (wBar / 2))
+                 .attr("dy", "1em")
+                 .style("text-anchor", "middle")
+                 .style("font-weight", "bolder")
+                 .style("font-size", "11px")
+                 .text("Amount of passengers in each ride");
+
+          })
 
         })
 
