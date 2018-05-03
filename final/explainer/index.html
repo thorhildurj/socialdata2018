@@ -22,6 +22,10 @@
               flex-direction: column;
             }
 
+            .todo {
+              background-color: rgb(255,255,200);
+            }
+
             p {
               color: #555;
               text-align: justify;
@@ -34,6 +38,10 @@
             b {
               margin-top: 14px;
               margin-bottom: -12px;
+            }
+
+            a {
+              font-weight: 400;
             }
 
         </style>
@@ -70,9 +78,31 @@
 
           <b>What was your goal for the end user’s experience?</b>
           <p>
-            TODO!
-          </p>
+            The goal is to tell the user a story, a story about how taxi drivers in NYC can use information
+            from the dataset as a leverage e.g. to earn more money. We want to show the user visualisation
+            based on big data, which can e.g. be used to:
+            <ul>
+              <li>
+                decide when during the day it is best to drive based on where the taxi driver is located
+                (or where the taxi driver lives)
+              </li>
+              <li>
+                decide where is the best pickup places for the taxi driver to maximize the length of the
+                trip and therefore earn more money
+              </li>
+              <li>
+                decide which pickup places are better than others based on if it is a weekend or not
+              </li>
+              <li>
+                etc.
+              </li>
+            </ul>
 
+            Therefore the goal is to have the story informative as well as to have the users, experience that they have learnt
+            something useful and can use the visualisation to take valuable actions if they are or intent to be NYC taxi
+            drivers.
+
+          </p>
 
 
 
@@ -100,14 +130,21 @@
             detected that there has been some input error on behalf of the taxi drivers when the record
             number of participants. That can be seen as few datapoints (trips) have 6, 7, 8 or 9
             number of participants even the yellow taxi (yellow taxi van) can maximum take 5 participants.
-            The datapoints that had clear input errors, were therefore removed.
+            The datapoints that were clearly affacted by input errors, were therefore removed.
           </p>
           <p>
-            TODO: talk about further data processing to create the visualisation.
+            To create visualisation on a webpage which has to be fast, it is critical to run some queries to
+            only get the necessary data for the visualisation. After the story has been decided and the
+            visualisation has been chosen, queries were runned to extract necessary data from the dataset.
+            The extracted data was stored locally on the web server in several CSV (.csv) files. The following
+            quires were used:
+          </p>
+          <p class="todo">
+            TODO: add the quires we used.
           </p>
 
           <b>Write a short section that discusses the dataset stats, containing key points/plots from your exploratory data analysis.</b>
-          <p>
+          <p class="todo">
             TODO!
           </p>
 
@@ -119,12 +156,12 @@
           <h2>3. Genre. Which genre of data story did you use?</h2>
 
           <b>Which tools did you use from each of the 3 categories of Visual Narrative (Figure 7 in Segal and Heer). Why?</b>
-          <p>
+          <p class="todo">
             TODO!
           </p>
 
           <b>Which tools did you use from each of the 3 categories of Narrative Structure (Figure 7 in Segal and Heer). Why?</b>
-          <p>
+          <p class="todo">
             TODO!
           </p>
 
@@ -136,12 +173,12 @@
           <h2>4. Visualizations</h2>
 
           <b>Explain the visualizations you’ve chosen.</b>
-          <p>
+          <p class="todo">
             TODO!
           </p>
 
           <b>Why are they right for the story you want to tell?</b>
-          <p>
+          <p class="todo">
             TODO!
           </p>
 
@@ -154,11 +191,22 @@
 
           <b>What went well?</b>
           <p>
-            TODO!
+            Overall the execution of our plan for this analaysis project went great.
+            As in most cases when you work with real and massive amount of data the
+            data cleaning and preprocessing takes some time, getting good understanding
+            of the data, detect outliers and make it useable. Even it took quite of time
+            and effort we didn't hit any major problems with it.
+          </p>
+          <p>
+            We had to fine tune little bit how we wanted to structure our story and
+            visualisation after getting feedback from Assignment 1. After that was done
+            it went really well building the visualisation as we have had some good experience
+            from all of the weekly exercise and because we had prepare the story structure
+            really well.
           </p>
 
           <b>What is still missing? What could be improved?, Why?</b>
-          <p>
+          <p class="todo">
             TODO!
           </p>
 
