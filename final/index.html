@@ -53,13 +53,27 @@
               box-shadow: 0 0 1px rgba(0, 0, 0, 0.15);
             }
 
-            .button {
+            .button_bottom {
               color: white;
+                align-self: center;
+              width: 600px;
               background-color: #039be5;
               box-shadow: 0 2px 5px 0 rgba(0,0,0,.26);
               padding: 8px 16px;
               margin: 30px 0 0 0;
               text-decoration: none;
+            }
+
+            .play-hour-btn {
+              width: 240px;
+              align-self: center;
+              color: white;
+              background-color: #039be5;
+              padding: 7px 20px 7px 20px;
+            }
+
+            #hours_chart1, #duration_chart1 {
+              align-self: center;
             }
 
         </style>
@@ -93,7 +107,29 @@
             </div>
 
             <div class="website-container">
+              <p>
+                Below you can see two graphs:
+                <ul>
+                  <li>Bar chart representing number of taxi trips of each hour</li>
+                  <li>Bar chart representing number of taxi trips of different trip length (in minutes) in total of all the hours selected with the hour brush in the first bar chart</li>
+                </ul>
+                With the hour brush in the first bar chart you can play around to see how
+                the trip length of taxi trips changes for different hours, just highlight
+                specific area in the first bar chart. To see the changes more easily you can use
+                the "Animate brush" button below the first bar chart to see the changes visually
+                automatically.
+              </p>
               <div id="hours_chart1"></div>
+              <button onclick="onHoursPlay()" class="play-hour-btn">Animate brush!</button>
+              <br  />
+              <div id="duration_chart1"></div>
+              <p>
+                When the trip duration is examined for different hours (try the "Animate brush" button)
+                some useful information can be read from the visualisation. It seems that trips
+                in the afternoon and in the eveneing are longer (longer duration) compared to trips
+                during the night or before noon. This means that taxi drivers which want to get more
+                money from each trip should rather work in the afternoon as longer trips cost more.
+              </p>
             </div>
 
 
@@ -101,19 +137,39 @@
             <br />
             <br />
             <br />
-            <a href="explainer" class="button" target="_blank">
+
+
+            <a href="explainer" class="button_bottom" target="_blank">
               OPEN EXPLAINER ANALYSIS PAGE
             </a>
 
-            <a href="http://www.nyc.gov/html/tlc/html/about/trip_record_data.shtml" class="button" target="_blank">
+            <a href="http://www.nyc.gov/html/tlc/html/about/trip_record_data.shtml" class="button_bottom" target="_blank">
               DATA USED IN THE PROJECT
             </a>
+
           </p>
 
         </div>
 
 
         <script type="text/javascript">
+
+
+        /**************************************************/
+        /************* COMMON VARIABLES STARTS *************/
+        var width = 812;
+        var height = 350;
+        var padding = 40;
+
+        function make_y_axis(scale, svg) {
+          return d3.axisLeft()
+                    .scale(scale)
+                    .ticks(5);
+        }
+        /************** COMMON VARIABLES ENDS *************/
+        /**************************************************/
+
+
 
         //Function to make a new subset dataset for passenger count on map
         var getSubDataset = function (datasetWithAllTypes, foodProduceIndex) {
@@ -264,19 +320,12 @@
           *****                 Barcharts with hours                 *****
           ****************************************************************/
 
-
-          function make_y_axis(scale, svg) {
-            return d3.axisLeft()
-                      .scale(scale)
-                      .ticks(5);
-          }
           // Next we declare some usefule variables
           var possibleHours = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
-          var widthHoursChart = 900;
-          var heightHoursChart = 350;
+          var positionsHours = [];
           var xScaleHoursChart, yScaleHoursChart, svgHoursChart, xAxisHoursChart, yAxisHoursChart;
-          var paddingHoursChart = 40;
           var brushhour
+          var hourDataset;
 
           var rowHoursConverter = function(d) {
             return {
@@ -289,30 +338,36 @@
           d3.csv("data/hours_number_only.csv", rowHoursConverter, function(data) {
 
             var dataset = data;
+            hourDataset = dataset.slice();
 
             // lets create the scales
             xScaleHoursChart = d3.scaleBand()
               .domain(possibleHours)
-              .rangeRound([paddingHoursChart * 2, widthHoursChart])  // 'rangeRound' enables rounding | double padding to make room for the numbers
-              .paddingInner(0.2);
+              .rangeRound([padding * 2, width])  // 'rangeRound' enables rounding | double padding to make room for the numbers
+              .paddingInner(0.5);
+
+            // update positionsHours array
+            for (var i = 0; i < 24; i++) {
+              positionsHours.push(xScaleHoursChart(i));
+            }
 
             yScaleHoursChart = d3.scaleLinear()
               .domain([0, d3.max(dataset, function(d) { return d.num; })])
-              .range([heightHoursChart - paddingHoursChart, paddingHoursChart * 2]); // double padding on the top to have room for title
+              .range([height - padding, padding * 2]); // double padding on the top to have room for title
 
             //Create SVG element
             svgHoursChart = d3.select("#hours_chart1")
                     .append("svg")
-                    .attr("width", widthHoursChart)
-                    .attr("height", heightHoursChart);
+                    .attr("width", width)
+                    .attr("height", height);
 
             // Setting chart lines (really long ticks)
             svgHoursChart.append("g")
                .call(make_y_axis(yScaleHoursChart, svgHoursChart)
-                      .tickSize(-widthHoursChart, 0, 0)
+                      .tickSize(-width, 0, 0)
                       .tickFormat("")
                )
-               .attr("transform", "translate(" + paddingHoursChart * 2 + ",0)");
+               .attr("transform", "translate(" + padding * 2 + ",0)");
 
             //Create bars
             svgHoursChart.selectAll("rect")
@@ -325,9 +380,12 @@
                .attr("y", function(d) {
                   return yScaleHoursChart(d.num);
                })
+               .attr("class", function(d, i) {
+                 return "hour-rect-no-" + i;
+               })
                .attr("width", xScaleHoursChart.bandwidth())
                .attr("height", function(d) {
-                  return heightHoursChart - yScaleHoursChart(d.num) - paddingHoursChart;
+                  return height - yScaleHoursChart(d.num) - padding;
                })
                .attr("fill", function(d) {
                  return "#25b898"
@@ -346,20 +404,20 @@
              //Create X axis
              svgHoursChart.append("g")
                 .attr("class", "x axis")
-                .attr("transform", "translate(0," + (heightHoursChart - paddingHoursChart) + ")")
+                .attr("transform", "translate(0," + (height - padding) + ")")
                 .call(xAxisHoursChart);
 
              //Create Y axis
              svgHoursChart.append("g")
                .attr("class", "y axis")
-               .attr("transform", "translate(" + paddingHoursChart * 2 + ",0)") // double padding to make room for the numbers
+               .attr("transform", "translate(" + padding * 2 + ",0)") // double padding to make room for the numbers
                .call(yAxisHoursChart);
 
              // Setting y label
              svgHoursChart.append("text")
                 .attr("transform", "rotate(-90)")
                 .attr("y", 0)
-                .attr("x",0 - (heightHoursChart / 2))
+                .attr("x",0 - (height / 2))
                 .attr("dy", "1em")
                 .style("text-anchor", "middle")
                 .style("font-weight", "bolder")
@@ -368,8 +426,8 @@
 
             // Setting x label
             svgHoursChart.append("text")
-               .attr("y", heightHoursChart - 15)
-               .attr("x", (widthHoursChart / 2))
+               .attr("y", height - 15)
+               .attr("x", (width / 2))
                .attr("dy", "1em")
                .style("text-anchor", "middle")
                .style("font-weight", "bolder")
@@ -378,52 +436,315 @@
 
              // Setting the title
              svgHoursChart.append("text")
-                .attr("x", widthHoursChart / 2)
-                .attr("y", paddingHoursChart) // we want little bit of padding from the top
+                .attr("x", width / 2)
+                .attr("y", padding) // we want little bit of padding from the top
                 .attr("text-anchor", "middle")
                 .style("font-size", "19px")
                 .style("font-weight", "bolder")
-                .text("Pickup Hour");
+                .text("Pickup Hour (brushable grap)");
 
             // setting the brush
             brushHour = d3.brushX()
-                    .extent([[paddingHoursChart * 2, paddingHoursChart * 2], [widthHoursChart, heightHoursChart - paddingHoursChart]])
-                    .on("brush", highlightBrushedHour);
-                    // .on("end", onBrushEnd);
+                    .extent([[padding * 2, padding * 2], [width, height - padding]])
+                    .on("brush", highlightBrushedHour)
+                    .on("end", onBrushHourEnd);
 
             svgHoursChart.append("g")
+                         .attr("class", "brush-hour")
                          .call(brushHour);
+
+
         });
+
+        function onHoursPlay() {
+
+          updateBrush(0);
+
+
+        }
+
+        function updateBrush(i)  {
+          var numberOfRectChosenEachTime = 3;
+
+          var leftPosition = xScaleHoursChart(i) + 3; // extra 3 because otherwise the brush will take one extra rect to the left
+          var rightPosition = xScaleHoursChart(i + numberOfRectChosenEachTime) + 10; // 10 a random number so the edge of the brush is little bit more to the right
+          d3.select(".brush-hour").call(brushHour.move, [leftPosition, rightPosition]);
+
+          var newI = ++i;
+          if (newI < 24 - numberOfRectChosenEachTime) {
+            setTimeout(function() {
+              updateBrush(++i)
+            }, 400);
+          }
+        }
+
+        function onBrushHourEnd () {
+          if (!d3.event.selection) {
+            // nothing is highlighted
+            var leftHour = 0;
+            var rightHour = 23;
+
+            for (var i = 0; i < 24; i++) {
+              svgHoursChart.selectAll(".hour-rect-no-" + i)
+                 .data(hourDataset)
+                 .transition()
+                 .duration(300)
+                 .attr("fill", function(d) {
+                   return "#25b898";
+                 });
+            }
+
+            // update map with selected data
+            updateDurationMapWithSelectedData(leftHour, rightHour);
+          }
+
+        }
 
 
         function highlightBrushedHour() {
              if (d3.event.selection != null) {
 
-//               var extent = d3.event.selection.map(xScale.invert, xScale);
-//
-//               // extract left and right edge date information from the extent
-//               var leftTime = extent[0].getTime();
-//               var rightTime = extent[1].getTime();
-//               var leftTimeDate = new Date(leftTime);
-//               var rightTimeDate = new Date(rightTime);
-//
-//               // create new data array with the selected data
-//               var selectedData = [];
-//               for (var i = 0; i < murderData.length; i++) {
-//                 if (murderData[i].date > leftTimeDate && murderData[i].date < rightTimeDate) {
-//                   selectedData.push(murderData[i])
-//                 }
-//               }
-//
-//               // if no data is selected we show the whole dataset
-//               if (selectedData.length == 0) {
-//                 selectedData = murderData;
-//               }
-//
-//               // update map with selected data
-//               updateMapWithSelectedData(selectedData);
+               var extent = d3.event.selection;
+               var leftHour = 0;
+               var rightHour = 23;
+
+               for (var i = 0; i < 24; i++) {
+                 if (extent[0] > positionsHours[i]) {
+                   leftHour = i;
+                 }
+               }
+
+               for (var i = 23; i >= 0; i--) {
+                 if (extent[1] < positionsHours[i]) {
+                   rightHour = i - 1;
+                 }
+               }
+
+               // if the width of the selection is zero (or so close to zero), than we use all hours
+               if (Math.abs(extent[0] - extent[1]) < 3) { // less than 3 pixels
+                 leftHour = 0;
+                 rightHour = 23;
+               }
+
+               for (var i = 0; i < 24; i++) {
+                 svgHoursChart.selectAll(".hour-rect-no-" + i)
+                    .data(hourDataset)
+                    .transition()
+                    .duration(300)
+                    .attr("fill", function(d) {
+
+                      if (i < leftHour || i > rightHour) {
+
+                        return "#999999";
+                      }
+                      return "#25b898";
+                    });
+               }
+
+               // update map with selected data
+               updateDurationMapWithSelectedData(leftHour, rightHour);
              }
          }
+
+
+
+
+         /***************************************************************
+         *****                Barcharts with duration               *****
+         ****************************************************************/
+
+
+//         function make_y_axis(scale, svg) {
+//           return d3.axisLeft()
+//                     .scale(scale)
+//                     .ticks(5);
+//         }
+
+          // Next we declare some usefule variables
+          var possibleDuration = Array.from(new Array(120), (x,i) => i);
+          possibleDuration.splice(0, 1); // we don't have any trips with duration 0 minutes, so lets remove that as a possibility
+          var xScaleDurationChart, yScaleDurationChart, svgDurationChart, xAxisDurationChart, yAxisDurationChart;
+          var durationDataset;
+
+          var rowDurationConverter = function(d) {
+            return {
+              minutes: parseInt(d.minutes),
+              hours: parseInt(d.hours),
+              num: parseInt(d.num),
+            };
+          }
+
+          var sortOutDurationBasedOnHour = function(beginHour, endHour) {
+            var newData = Array.from(new Array(120), (x,i) => i);
+            for (var i = 0; i < newData.length; i++) {
+              newData[i] = {'minutes': + i, 'num': 0  }
+            }
+            newData.splice(0, 1); // we don't have any trips with duration 0 minutes, so lets remove that as a possibility
+
+            for (var i = 0; i < durationDataset.length ; i++) {
+              if (durationDataset[i].hours >= beginHour && durationDataset[i].hours <= endHour) {
+                var minutes = durationDataset[i].minutes;
+                var numbers = durationDataset[i].num;
+                newData[minutes - 1].num += numbers;
+              }
+            }
+
+            return newData;
+          }
+
+
+          d3.csv("data/duration.csv", rowDurationConverter, function(data) {
+
+            var dataset = data.slice();
+            durationDataset = dataset.slice();
+            dataset = sortOutDurationBasedOnHour(22,23);
+
+            // lets create the scales
+            xScaleDurationChart = d3.scaleBand()
+              .domain(possibleDuration)
+              .rangeRound([padding * 2, width])  // 'rangeRound' enables rounding | double padding to make room for the numbers
+              .paddingInner(0.2);
+
+            yScaleDurationChart = d3.scaleLinear()
+              .domain([0, d3.max(dataset, function(d) { return d.num; })])
+              .range([height - padding, padding * 2]); // double padding on the top to have room for title
+
+            //Create SVG element
+            svgDurationChart = d3.select("#duration_chart1")
+                    .append("svg")
+                    .attr("width", width)
+                    .attr("height", height);
+
+//            // Setting chart lines (really long ticks)
+//            svgDurationChart.append("g")
+//               .call(make_y_axis(yScaleDurationChart, svgDurationChart)
+//                      .tickSize(-width, 0, 0)
+//                      .tickFormat("")
+//               )
+//               .attr("transform", "translate(" + padding * 2 + ",0)");
+
+            //Create bars
+            svgDurationChart.selectAll("rect")
+               .data(dataset)
+               .enter()
+               .append("rect")
+               .attr("x", function(d, i) {
+                  return xScaleDurationChart(d.minutes);  // Setting x values
+               })
+               .attr("y", function(d) {
+                  return yScaleDurationChart(d.num);
+               })
+               .attr("width", xScaleDurationChart.bandwidth())
+               .attr("height", function(d) {
+                  return height - yScaleDurationChart(d.num) - padding;
+               })
+               .attr("fill", function(d) {
+                 return "#25b898"
+               });
+
+             // to skip some ticks on x axis we create new array
+             var xAxisTicks = possibleDuration.slice();;
+             for (var i = 0; i < xAxisTicks.length; i++) {
+               if ((i + 1) % 5 == 0) {
+
+               } else if (i != 0) {
+                 xAxisTicks[i] = 1; // so we just draw a lot of ticks for "1" on the x axis
+               }
+
+             }
+
+             // Define X axis
+             xAxisDurationChart = d3.axisBottom()
+                 .scale(xScaleDurationChart)
+                 .tickValues(xAxisTicks);
+                 //.tickValues(xAxisTicks);
+
+             //Define Y axis
+             yAxisDurationChart = d3.axisLeft()
+                       .scale(yScaleDurationChart)
+                       .ticks(5);
+
+             //Create X axis
+             svgDurationChart.append("g")
+                .attr("class", "x_duration axis_duration")
+                .attr("transform", "translate(0," + (height - padding) + ")")
+                .call(xAxisDurationChart);
+
+             //Create Y axis
+             svgDurationChart.append("g")
+               .attr("class", "y_dyration axis_duration")
+               .attr("transform", "translate(" + padding * 2 + ",0)") // double padding to make room for the numbers
+               .call(yAxisDurationChart);
+
+             // Setting y label
+             svgDurationChart.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0)
+                .attr("x",0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .style("font-weight", "bolder")
+                .style("font-size", "10px")
+                .text("# of taxi trips");
+
+            // Setting x label
+            svgDurationChart.append("text")
+               .attr("y", height - 15)
+               .attr("x", (width / 2))
+               .attr("dy", "1em")
+               .style("text-anchor", "middle")
+               .style("font-weight", "bolder")
+               .style("font-size", "10px")
+               .text("Minutes");
+
+             // Setting the title
+             svgDurationChart.append("text")
+                .attr("x", width / 2)
+                .attr("y", padding) // we want little bit of padding from the top
+                .attr("text-anchor", "middle")
+                .style("font-size", "19px")
+                .style("font-weight", "bolder")
+                .text("Trip duration");
+
+          });
+
+
+          var updateDurationMapWithSelectedData = function(leftHour, rightHour) {
+            var dataset = sortOutDurationBasedOnHour(leftHour, rightHour);
+
+            yScaleDurationChart.domain([0, d3.max(dataset, function(d) { return d.num; })]);
+
+
+            // updating all bars
+            svgDurationChart.selectAll("rect")
+               .data(dataset)
+               .transition()
+               .duration(1000)
+               .attr("x", function(d, i) {
+                  return xScaleDurationChart(d.minutes);  // Setting x values
+               })
+               .attr("y", function(d) {
+                  return yScaleDurationChart(d.num);
+               })
+               .attr("width", xScaleDurationChart.bandwidth())
+               .attr("height", function(d) {
+                  return height - yScaleDurationChart(d.num) - padding;
+               })
+               .attr("fill", function(d) {
+                 return "#25b898"
+               });
+
+
+               //Update Y axis
+               svgDurationChart.select(".y_dyration.axis_duration")
+                   .transition()
+                   .duration(1000)
+                   .call(yAxisDurationChart);
+
+          }
+
+
+
 
 
 
