@@ -44,6 +44,21 @@
               font-weight: 400;
             }
 
+
+            code {
+                padding: 15px 30px 25px 30px;
+                background-color: #FAFAFA;
+                font-size: 12px;
+                line-height: 120%;
+                color: #777;
+                border-radius: 5px;
+                margin-bottom: 25px;
+            }
+
+            h4 {
+              text-decoration: underline;
+            }
+
         </style>
     </head>
     <body>
@@ -66,7 +81,7 @@
             number of passengers and trip distance.
           </p>
 
-          <b>Why did you choose this/these particular dataset(s)?</b>
+          <b>Why did you choose this / these particular dataset(s)?</b>
           <p>
             This dataset is really popular and has been used in many data analysis. The reason
             for that and a part of the reasons why we chose this dataset, is because it has a lot
@@ -127,23 +142,60 @@
             Then, different database tables for the trips data were merged, as the data has to be
             downloaded per month. Next unnecessary features were removed. Thereafter outliers were detected
             and necessary actions were taken based on the nature of the outliers. As an example, it can be
-            detected that there has been some input error on behalf of the taxi drivers when the record
+            detected that there has been some input error on behalf of the taxi drivers when they record the
             number of participants. That can be seen as few datapoints (trips) have 6, 7, 8 or 9
             number of participants even the yellow taxi (yellow taxi van) can maximum take 5 participants.
+            Another example of input error is datapoints where the drop-off timestamps are after the pickup
+            timestamps. This is though very few datapoints compared to the number of datapoints in the dataset.
             The datapoints that were clearly affacted by input errors, were therefore removed.
           </p>
-          <p class="todo">
-            TODO: nefna líka þegar trip duration er mínus tala o.s.frv.
+          <p>
+            For few of the visualisation some calculations had to be done. Trip duration was calculated based
+            on the pickup and drop-off timestamps. Further, the the hour of the day when a taxi driver pickups
+            a passenger was obtained from the pickup timestamp.
           </p>
           <p>
             To create visualisation on a webpage which has to be fast, it is critical to run some queries to
             only get the necessary data for the visualisation. After the story has been decided and the
             visualisation has been chosen, queries were runned to extract necessary data from the dataset.
             The extracted data was stored locally on the web server in several CSV (.csv) files. The following
-            quires were used:
+            queries were used:
           </p>
+          <code>
+            <h4>Number of trips and hours:</h4>
+            SELECT  <br />
+            &nbsp;  HOUR(tpep_pickup_datetime) AS hours,  <br />
+            &nbsp;  COUNT(*) AS num,  <br />
+            FROM  <br />
+            &nbsp;  [social-data-dtu:green_text.all17]  <br />
+            WHERE  <br />
+            &nbsp;  tpep_pickup_datetime is not null  <br />
+            GROUP BY  <br />
+            &nbsp;  hours  <br />
+            ORDER BY  <br />
+            &nbsp;  Hours  <br />
+
+          </code>
+          <code>
+            <h4>Trip duration and number of trips per hour:</h4>
+            SELECT  <br />
+            &nbsp;   ROUND((TIMESTAMP_TO_USEC(tpep_dropoff_datetime) - TIMESTAMP_TO_USEC(tpep_pickup_datetime)) / 1000000/ 60) AS minutes,  <br />
+            &nbsp;   HOUR(tpep_pickup_datetime) AS hours,  <br />
+            &nbsp;   COUNT(*) AS num,  <br />
+            FROM  <br />
+            &nbsp;   [social-data-dtu:green_text.all17]  <br />
+            WHERE  <br />
+            &nbsp;   tpep_pickup_datetime is not null AND  <br />
+            &nbsp;   ROUND((TIMESTAMP_TO_USEC(tpep_dropoff_datetime) - TIMESTAMP_TO_USEC(tpep_pickup_datetime)) / 1000000/ 60) < 120 AND  <br />
+            &nbsp;     ROUND((TIMESTAMP_TO_USEC(tpep_dropoff_datetime) - TIMESTAMP_TO_USEC(tpep_pickup_datetime)) / 1000000/ 60) > 0  <br />
+            GROUP BY  <br />
+            &nbsp;   hours, minutes  <br />
+            ORDER BY  <br />
+            &nbsp;   minutes  <br />
+
+          </code>
           <p class="todo">
-            TODO: add the quires we used.
+            TODO: add the missing data queries.
           </p>
 
           <b>Write a short section that discusses the dataset stats, containing key points/plots from your exploratory data analysis.</b>
