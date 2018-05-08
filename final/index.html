@@ -53,6 +53,17 @@
               box-shadow: 0 0 1px rgba(0, 0, 0, 0.15);
             }
 
+            .website-container-inner {
+              display: flex;
+              flex-direction: column;
+              width: 100%;
+              align-self: center;
+              background-color: white;
+              padding: 50px 30px 30px 30px;
+              margin: 55px 0 0 0;
+              box-shadow: 0 -5px 1px -5px rgba(0, 0, 0, 0.15);
+            }
+
             .button_bottom {
               color: white;
                 align-self: center;
@@ -76,6 +87,38 @@
               align-self: center;
             }
 
+            .subtitle {
+              font-size: 24px;
+              font-weight: 200;
+              color: #666;
+              line-height: 160%;
+              margin-top: 14px;
+              margin-bottom: 10px;
+            }
+
+            .subtitle-less-spacing {
+              margin-top: -4px;
+              margin-bottom: 10px;
+            }
+
+            h1, h2 {
+              font-weight: bolder;
+            }
+
+            .taxi_pic {
+              width: 100%;
+              height: auto;
+              margin-top: 15px;
+            }
+
+            .pic_text {
+              font-size: 10px;
+              font-style: italic;
+              color: #888;
+              align-self: flex-end;
+              margin-bottom: -20px;
+            }
+
         </style>
     </head>
     <body>
@@ -87,36 +130,85 @@
           </div>
         </div>
 
+
+
+
         <div class="website-container">
-          <h1 class="assignment-header">NYC taxi data</h1>
+
+          <h1 class="assignment-header">How to use data to gain leverage as a New York City taxi driver</h1>
+          <p class="subtitle subtitle-less-spacing">
+            New York City drivers can use data as an advantage and take data-driven decisions to maximize
+            their income.
+          </p>
           <p>
-            We analyzed data for NYC taxi trips and we will show our findings here.
+            Our findings on how New York City drivers can use data, to increase their chances on earning more money,
+            will be shown below.
+          </p>
 
-            <div id="geoMap">
-              <h3>Here is geoMap</h3>
+          <img src="./taxis.jpg" class="taxi_pic"/>
+          <span class="pic_text">
+            Picture by
+            <a href="https://www.publicdomainpictures.net/en/view-image.php?image=180391&picture=nyc-yellow-taxi" target="_blank">Public Domain Pictures.net</a>
+          </span>
 
-              <ul>
-                <li onclick="updateChartBar(1)"><span class="chart-option">Passenger amount: 1</span></li>
-                <li onclick="updateChartBar(2)"><span class="chart-option">Passenger amount: 2</span></li>
-                <li onclick="updateChartBar(3)"><span class="chart-option">Passenger amount: 3</span></li>
-                <li onclick="updateChartBar(4)"><span class="chart-option">Passenger amount: 4</span></li>
-                <li onclick="updateChartBar(5)"><span class="chart-option">Passenger amount: 5</span></li>
-                <li onclick="updateChartBar(6)"><span class="chart-option">Passenger amount: 6</span></li>
-              </ul>
+          <div class="website-container-inner">
+            <h2>Some clever title here</h2>
+            <p>
+              We analyzed data for NYC taxi trips and we will show our findings here.
 
+              <div id="geoMap">
+                <h3>Here is geoMap</h3>
+
+                <ul>
+                  <li onclick="updateChartBar(1)"><span class="chart-option">Passenger amount: 1</span></li>
+                  <li onclick="updateChartBar(2)"><span class="chart-option">Passenger amount: 2</span></li>
+                  <li onclick="updateChartBar(3)"><span class="chart-option">Passenger amount: 3</span></li>
+                  <li onclick="updateChartBar(4)"><span class="chart-option">Passenger amount: 4</span></li>
+                  <li onclick="updateChartBar(5)"><span class="chart-option">Passenger amount: 5</span></li>
+                  <li onclick="updateChartBar(6)"><span class="chart-option">Passenger amount: 6</span></li>
+                </ul>
+
+              </div>
             </div>
 
-            <div class="website-container">
+            <div class="website-container-inner">
+              <h2>When during the day is the best time to drive?</h2>
+              <p class="subtitle subtitle-less-spacing">
+                How can taxi drivers use data to find out which hours they make the most money
+              </p>
               <p>
-                Below you can see two graphs:
+                Lets start looking at how many trips are there for each hour of the day:
+              </p>
+              <div id="hours_chart2"></div>
+              <p>
+                From this graph, it is possible to see that there is more demand for New York
+                taxis in the afternoon and in the evening but less demand during the morning and the nights.
+                So for taxi drivers driving on high demands time, they decrease their probability to stay idle
+                for a long time without passengers.
+              </p>
+              <p>
+                But it is not enough to just look at when is the most demands for taxi drivers to maximize their
+                income. It is also matters of how long each taxi trip is, the longer the trip is, the more it cost
+                and the more money does the driver get.
+              </p>
+              <p class="subtitle">
+                Looking at trip duration for different hours of the day
+              </p>
+
+              <p>
+                By looking at how long the trips are in terms of time, or duration it is possible to examine
+                how long the trips are on different hours of the day.
+              </p>
+              <p>
+                Below there are two graphs to visualise that:
                 <ul>
-                  <li>Bar chart representing number of taxi trips of each hour</li>
+                  <li>An interactive, brushable, bar chart representing number of taxi trips of each hour</li>
                   <li>Bar chart representing number of taxi trips of different trip length (in minutes) in total of all the hours selected with the hour brush in the first bar chart</li>
                 </ul>
-                With the hour brush in the first bar chart you can play around to see how
-                the trip length of taxi trips changes for different hours, just highlight
+                With the hour brush in the first bar chart, you can play around to see how
+                the trip length of taxi trips changes for different hours, just highlight (brush)
                 specific area in the first bar chart. To see the changes more easily you can use
-                the "Animate brush" button below the first bar chart to see the changes visually
+                the "Animate brush" button, below the first bar chart, to see the changes visually
                 automatically.
               </p>
               <div id="hours_chart1"></div>
@@ -126,16 +218,26 @@
               <p>
                 When the trip duration is examined for different hours (try the "Animate brush" button)
                 some useful information can be read from the visualisation. It seems that trips
-                in the afternoon and in the eveneing are longer (longer duration) compared to trips
+                in the afternoon and in the evening are longer (longer duration) compared to trips
                 during the night or before noon. This means that taxi drivers which want to get more
-                money from each trip should rather work in the afternoon as longer trips cost more.
+                money from each trip should rather work in the afternoon or in the evening as longer trips cost more.
+              </p>
+              <p>
+                From this can be seen that there is both higher demands and longer trips in the afternoon and in the evening.
+              </p>
+
+            </div>
+
+            <div class="website-container-inner">
+              <h2>Conclusion</h2>
+              <p>
+                New York City taxi drivers can try to maximize their income by taking data-driven decisions.
+                From the visualisation above, drivers can understand where and when they should drive to increase
+                their chances of earning more money.
               </p>
             </div>
 
 
-            <br />
-            <br />
-            <br />
             <br />
 
 
@@ -146,6 +248,15 @@
             <a href="http://www.nyc.gov/html/tlc/html/about/trip_record_data.shtml" class="button_bottom" target="_blank">
               DATA USED IN THE PROJECT
             </a>
+
+            <br />
+            <br />
+
+            <img src="./taxis2.jpg" class="taxi_pic"/>
+            <span class="pic_text">
+              Picture by
+              <a href="https://commons.wikimedia.org/wiki/File:Yellow_cabs_(4855499362).jpg" target="_blank">Wikimedia Commons</a>
+            </span>
 
           </p>
 
@@ -313,6 +424,132 @@
 
 
 
+          /***************************************************************
+          *****               Barcharts with hours only              *****
+          ****************************************************************/
+
+
+          // Next we declare some usefule variables
+          var possibleHoursOnly = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
+          var positionsHoursOnly = [];
+          var xScaleHoursOnlyChart, yScaleHoursOnlyChart, svgHoursOnlyChart, xAxisHoursOnlyChart, yAxisHoursOnlyChart;
+
+          var rowHoursOnlyConverter = function(d) {
+            return {
+              hours: parseInt(d.hours),
+              num: parseInt(d.num),
+            };
+          }
+
+
+          d3.csv("data/hours_number_only.csv", rowHoursOnlyConverter, function(data) {
+
+            var dataset = data;
+
+            // lets create the scales
+            xScaleHoursOnlyChart = d3.scaleBand()
+              .domain(possibleHoursOnly)
+              .rangeRound([padding * 2, width])  // 'rangeRound' enables rounding | double padding to make room for the numbers
+              .paddingInner(0.5);
+
+            // update positionsHoursOnly array
+            for (var i = 0; i < 24; i++) {
+              positionsHoursOnly.push(xScaleHoursOnlyChart(i));
+            }
+
+            yScaleHoursOnlyChart = d3.scaleLinear()
+              .domain([0, d3.max(dataset, function(d) { return d.num; })])
+              .range([height - padding, padding * 2]); // double padding on the top to have room for title
+
+            //Create SVG element
+            svgHoursOnlyChart = d3.select("#hours_chart2")
+                    .append("svg")
+                    .attr("width", width)
+                    .attr("height", height);
+
+            // Setting chart lines (really long ticks)
+            svgHoursOnlyChart.append("g")
+               .call(make_y_axis(yScaleHoursOnlyChart, svgHoursOnlyChart)
+                      .tickSize(-width, 0, 0)
+                      .tickFormat("")
+               )
+               .attr("transform", "translate(" + padding * 2 + ",0)");
+
+            //Create bars
+            svgHoursOnlyChart.selectAll("rect")
+               .data(dataset)
+               .enter()
+               .append("rect")
+               .attr("x", function(d, i) {
+                  return xScaleHoursOnlyChart(d.hours);  // Setting x values
+               })
+               .attr("y", function(d) {
+                  return yScaleHoursOnlyChart(d.num);
+               })
+               .attr("class", function(d, i) {
+                 return "hour-rect-no-" + i;
+               })
+               .attr("width", xScaleHoursOnlyChart.bandwidth())
+               .attr("height", function(d) {
+                  return height - yScaleHoursOnlyChart(d.num) - padding;
+               })
+               .attr("fill", function(d) {
+                 return "#25b898"
+               });
+
+             // Define X axis
+             xAxisHoursOnlyChart = d3.axisBottom()
+                 .scale(xScaleHoursOnlyChart)
+                 .tickValues(possibleHoursOnly);
+
+             //Define Y axis
+             yAxisHoursOnlyChart = d3.axisLeft()
+                       .scale(yScaleHoursOnlyChart)
+                       .ticks(5);
+
+             //Create X axis
+             svgHoursOnlyChart.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + (height - padding) + ")")
+                .call(xAxisHoursOnlyChart);
+
+             //Create Y axis
+             svgHoursOnlyChart.append("g")
+               .attr("class", "y axis")
+               .attr("transform", "translate(" + padding * 2 + ",0)") // double padding to make room for the numbers
+               .call(yAxisHoursOnlyChart);
+
+             // Setting y label
+             svgHoursOnlyChart.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0)
+                .attr("x",0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .style("font-weight", "bolder")
+                .style("font-size", "10px")
+                .text("# of taxi trips");
+
+            // Setting x label
+            svgHoursOnlyChart.append("text")
+               .attr("y", height - 15)
+               .attr("x", (width / 2))
+               .attr("dy", "1em")
+               .style("text-anchor", "middle")
+               .style("font-weight", "bolder")
+               .style("font-size", "10px")
+               .text("Hour");
+
+             // Setting the title
+             svgHoursOnlyChart.append("text")
+                .attr("x", width / 2)
+                .attr("y", padding) // we want little bit of padding from the top
+                .attr("text-anchor", "middle")
+                .style("font-size", "19px")
+                .style("font-weight", "bolder")
+                .text("Pickup Hour");
+
+          });
 
 
 
