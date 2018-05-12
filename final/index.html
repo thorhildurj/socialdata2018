@@ -168,7 +168,23 @@
                   <li onclick="updateChartBar(6)"><span class="chart-option">Passenger amount: 6</span></li>
                 </ul>
 
-              </div>
+              <h2>Choose how many passengers</h2>
+              <ul>
+                <li> <input type="checkbox" id="myCheck1" onclick="updateChartBar(1)">
+                     <span class="chart-option"> 1 </span> </li>
+                <li> <input type="checkbox" id="myCheck2" onclick="updateChartBar(2)">
+                     <span class="chart-option"> 2 </span> </li>
+                <li> <input type="checkbox" id="myCheck3" onclick="updateChartBar(3)">
+                     <span class="chart-option"> 3 </span> </li>
+                <li> <input type="checkbox" id="myCheck4" onclick="updateChartBar(4)">
+                     <span class="chart-option"> 4 </span> </li>
+                <li> <input type="checkbox" id="myCheck5" onclick="updateChartBar(5)">
+                     <span class="chart-option"> 5 </span> </li>
+                <li> <input type="checkbox" id="myCheck6" onclick="updateChartBar(6)" >
+                     <span class="chart-option"> 6 </span> </li>
+              </ul>
+
+
             </div>
 
             <div class="website-container-inner">
@@ -287,12 +303,12 @@
 
 
         //Function to make a new subset dataset for passenger count on map
-        var getSubDataset = function (datasetWithAllTypes, foodProduceIndex) {
+        var getSubDataset = function (datasetWithAllTypes, passengerIndex) {
           var dataset = [];
           for (var i = 0; i < datasetWithAllTypes.length; i++) {
             var entry = datasetWithAllTypes[i];
             passenger_value = parseFloat(entry.passenger_count)
-            if (passenger_value === foodProduceIndex) {
+            if (passenger_value === passengerIndex) {
               dataset.push(entry)
             }
           }
@@ -304,7 +320,7 @@
         var hMap = 600;
         var datasetWithAllPassengers;
         var jsonData;
-        var passengerIndex = 1;
+        var passengerIndex = 7;
 
 
   			//Note: You need to lower the translate and make scale higher to make it a bigger map
@@ -381,48 +397,103 @@
 
            //Function to update the map when clicking the buttons
            var updateChartBar = function(passengerIndex) {
+             //Bind the myCheck og passengerIndex together
+             var idCheck = "myCheck"+passengerIndex
 
-             //get the subdataset
-             var subDataset = getSubDataset(datasetWithAllPassengers, passengerIndex, jsonData);
-             //now update the map
-             colorMap.domain([
-                     d3.min([0]),
-                     d3.max(subDataset, function(d) {return d.num; })
-                     ]);
+             //lets check if the box is checked or unchecked
+             if (document.getElementById(idCheck).checked){
+               console.log("hann er checked")
+               //get the subdataset
+               var subDataset = getSubDataset(datasetWithAllPassengers, passengerIndex, jsonData);
 
-               //Merge the taxi data and GeoJSON. Loop through once for each taxi data value
-               for (var i = 0; i < subDataset.length; i++) {
-                 //Lets grap the id of the zone
-                 var zoneID = subDataset[i].PULocationID;
-                 //Grab the passenger value, and convert from string to float
-                 var passengerValue = parseFloat(subDataset[i].num);
+               //now update the map
+               colorMap.domain([
+                       d3.min([0]),
+                       d3.max(subDataset, function(d) {return d.num; })
+                       ]);
 
-                 //Find the corresponding state inside the GeoJSON
-                 for (var j = 0; j < jsonData.features.length; j++) {
-                   var jsonZone = jsonData.features[j].properties.locationid;
-                   if (zoneID == jsonZone) {
-                     //Copy the data value into the JSON
-                     jsonData.features[j].properties.valueP = passengerValue;
-                     //Stop looking through the JSON
-                     break;
+                 //Merge the taxi data and GeoJSON. Loop through once for each taxi data value
+                 for (var i = 0; i < subDataset.length; i++) {
+                   //Lets grap the id of the zone
+                   var zoneID = subDataset[i].PULocationID;
+                   //Grab the passenger value, and convert from string to float
+                   var passengerValue = parseFloat(subDataset[i].num);
+
+                   //Find the corresponding state inside the GeoJSON
+                   for (var j = 0; j < jsonData.features.length; j++) {
+                     var jsonZone = jsonData.features[j].properties.locationid;
+                     if (zoneID == jsonZone) {
+                       //Copy the data value into the JSON
+                       jsonData.features[j].properties.valueP = passengerValue;
+                       //Stop looking through the JSON
+                       break;
+                     }
                    }
                  }
-               }
-               //Bind data and create one path per GeoJSON feature
-              svgMap.selectAll("path")
-                 .data(jsonData.features)
-                 .transition()
-                 .duration(500)
-                 .attr("d", path)
-                 .style("fill", function(d) {
-                     var value = d.properties.valueP;
-                     if (value) {
-                       return colorMap(value);
-                     } else {
-                       //If value is undefined
-                       return "#ccc";
+                 //Bind data and create one path per GeoJSON feature
+                svgMap.selectAll("path")
+                   .data(jsonData.features)
+                   .transition()
+                   .duration(800)
+                   .attr("d", path)
+                   .style("fill", function(d) {
+                       var value = d.properties.valueP;
+                       if (value) {
+                         return colorMap(value);
+                       } else {
+                         //If value is undefined
+                         return "#ccc";
+                       }
+                    });
+             }
+             else{
+               console.log("uncheck :( )")
+               var subDataset = getSubDataset(datasetWithAllPassengers, 7, jsonData);
+
+               //now update the map
+               colorMap.domain([
+                       d3.min([0]),
+                       d3.max(subDataset, function(d) {return d.num; })
+                       ]);
+
+                 //Merge the taxi data and GeoJSON. Loop through once for each taxi data value
+                 for (var i = 0; i < subDataset.length; i++) {
+                   //Lets grap the id of the zone
+                   var zoneID = subDataset[i].PULocationID;
+                   //Grab the passenger value, and convert from string to float
+                   var passengerValue = parseFloat(subDataset[i].num);
+
+                   //Find the corresponding state inside the GeoJSON
+                   for (var j = 0; j < jsonData.features.length; j++) {
+                     var jsonZone = jsonData.features[j].properties.locationid;
+                     if (zoneID == jsonZone) {
+                       //Copy the data value into the JSON
+                       jsonData.features[j].properties.valueP = passengerValue;
+                       //Stop looking through the JSON
+                       break;
                      }
-                  });
+                   }
+                 }
+                 //Bind data and create one path per GeoJSON feature
+                svgMap.selectAll("path")
+                   .data(jsonData.features)
+                   .transition()
+                   .duration(800)
+                   .attr("d", path)
+                   .style("fill", function(d) {
+                       var value = d.properties.valueP;
+                       if (value) {
+                         return colorMap(value);
+                       } else {
+                         //If value is undefined
+                         return "#ccc";
+                       }
+                    });
+
+
+             }
+
+
 
            }
 
