@@ -81,7 +81,7 @@
             Taxi trips dataset for New York was used for the analysis. The dataset is from
             the website <a href="http://www.nyc.gov/html/tlc/html/about/trip_record_data.shtml" target="_blank">NYC.gov</a>.
             The dataset contains taxi trips from yellow and green taxis but only the data
-            for the yellow taxis were used. The dataset contains data of over 10 years, 2009-2017
+            for the yellow taxis were used. The dataset contains data from 2009-2017,
             but it was decided to analyse all the data from 2017. The dataset contains
             among other things: pickup / drop-off locations and timestamps, payment types,
             number of passengers and trip distance.
@@ -100,7 +100,7 @@
           <b>What was your goal for the end user’s experience?</b>
           <p>
             The goal is to tell the user a story, a story about how taxi drivers in NYC can use information
-            from the dataset as a leverage e.g. to earn more money. We want to show the user visualisation
+            from the dataset to earn more money. We want to show the user visualisation
             based on big data, which can e.g. be used to:
             <ul>
               <li>
@@ -112,19 +112,14 @@
                 trip and therefore earn more money
               </li>
               <li>
-                decide which pickup places are better than others based on if it is a weekend or not
-              </li>
-              <li>
-                etc.
+                decide which pickup places are better than others based on the passenger count
               </li>
             </ul>
 
-            Therefore the goal is to have the story informative as well as to have the users, experience that they have learnt
-            something useful and can use the visualisation to take valuable actions if they are or intend to be NYC taxi
-            drivers.
-
+            Therefore the goal is to have the story informative, as well as to make the users feel like they learnt
+            something useful and can use the visualisation to take valuable actions if their intend is to become a New York City taxi
+            driver.
           </p>
-
 
 
 
@@ -133,7 +128,7 @@
 
           <b>Write about your choices in data cleaning and preprocessing</b>
           <p>
-            The dataset for all the yellow trips 2017, is around 10GB. For this big dataset, it
+            The dataset for all the yellow taxi trips 2017, is around 10GB. For such big dataset, it
             doesn't work to have the data locally on a web server, so it has to be preprocessed
             and cleaned.
           </p>
@@ -149,21 +144,21 @@
             downloaded per month. Next unnecessary features were removed. Thereafter outliers were detected
             and necessary actions were taken based on the nature of the outliers. As an example, it can be
             detected that there has been some input error on behalf of the taxi drivers when they record the
-            number of participants. That can be seen as few data points (trips) have 6, 7, 8 or 9
-            number of participants even the yellow taxi (yellow taxi van) can maximum take 5 participants.
+            number of participants. That can be seen as few data points (or trips) have 7, 8 or 9
+            number of passengers even though the yellow taxis can maximum take 5 to 6 passengers (6 passengers if one passenger is a child younger than 7 years old).
             Another example of input error is data points where the drop-off timestamps are after the pickup
-            timestamps. This is though very few data points compared to the number of data points in the dataset.
+            timestamps. This were though very few data points compared to the number of data points in the dataset.
             The data points that were clearly affected by input errors, were therefore removed.
           </p>
           <p>
-            For few of the visualisation, some calculations had to be done. Trip duration was calculated based
+            For the visualisation, some calculations had to be done. Trip duration was calculated based
             on the pickup and drop-off timestamps. Further, the hour of the day when a taxi driver pickups
-            a passenger was obtained from the pickup timestamp.
+            a passenger was obtained from the pickup timestamp. Also, the number of taxi rides with a certain amount of passenger were calculated for each zone.
           </p>
           <p>
-            To create visualisations on a webpage which has to be fast, it is critical to run some queries to
-            only get the necessary data for the visualisation. After the story has been decided and the
-            visualisation has been chosen, queries were run to extract necessary data from the dataset.
+            To create visualisations on a webpage which has to be fast, it was critical to run some queries to
+            only get the necessary data for the visualisation. After the story had been decided and the
+            visualisation had been chosen, queries were run to extract necessary data from the dataset.
             The extracted data was stored locally on the web server in several CSV (.csv) files. The following
             queries were used:
           </p>
@@ -236,7 +231,7 @@
             &nbsp;  passenger_count > 1 <br />
           </code>
           <code>
-            <h4>Counting the taxi rides grouping by the amount of passengers :</h4>
+            <h4>Counting the taxi rides grouping by the amount of passengers:</h4>
             SELECT <br />
             &nbsp;  passenger_count, <br />
             &nbsp;  COUNT(*) AS num, <br />
@@ -252,7 +247,7 @@
             &nbsp;  passenger_count<br />
           </code>
           <code>
-            <h4>Counting how many taxi rides there were that contained certain amount of passenger per zone :</h4>
+            <h4>Counting how many taxi rides there were that contained certain amount of passenger per zone:</h4>
             SELECT <br />
             &nbsp;  PUlocationID, passenger_count,<br />
             &nbsp;  COUNT(*) AS num, <br />
@@ -269,7 +264,8 @@
           </code>
 
 
-
+          <br />
+          <br />
           <b>Write a short section that discusses the dataset stats, containing key points/plots from your exploratory data analysis.</b>
           <p>
             As mentioned before the data was around 10 GB, containing 93 millions rows. Each row represents
@@ -296,9 +292,13 @@
             </ul>
           </p>
           <p class="todo">
-            TODO: add key points/plots from your exploratory data analysis
+            Here are two graphs showing the number of taxi rides categories by passenger count, and number of taxi rides by the pick up hour.
+            <br />
+            <br />
+            <img src="graph1.png" alt="Taxi rides by passenger count" width="400" height="250" >
+            <br />
+            <img src="graph2.png" alt="Pickup Hour" width="400" height="250">
           </p>
-
 
 
 
@@ -306,8 +306,10 @@
           <!-- SECTION: 3 -->
           <h2>3. Genre. Which genre of data story did you use?</h2>
           <p class="todo">
-            The genre chosen was Annotated Graph. Bæta við meiri texta hér afhverju.
-            Segja kannski því það eigi best við þegar svona gögn eins og okkar eru visualizuð...?
+            The genre chosen was Annotated Chart. This genre was chosen as we thought it would fit best our data story.
+            Charts and graphs can convey so much information and it is common that people know how to read information from them.
+            If some certain information is to be pointed out to the reader, the can be conveyed by annotations on the chart which
+            fitted our story (e.g. the geo map tooltip).
           </p>
           <b>Which tools did you use from each of the 3 categories of Visual Narrative (Figure 7 in Segal and Heer). Why?</b>
           <p>
@@ -339,7 +341,7 @@
              <br />
              The Interactivity category includes seven tools and our visualisation uses three of them. <br />
              <b>Hover Highlighting/Details;</b> On the map when the user hovers over a zone, then the tooltip displays
-             details about how many trips with that many passengers began in that particular zone. <br />
+             details about how many trips with that many passengers began in that particular zone, and also the name of the zone. <br />
              <b>Filtering/Selection/Search;</b> On the map the user can filter the trips after how many passengers
              where in each trip with the six check buttons to the right. The user can choose if he sees all taxi
              trips or e.g. just taxi trips with 5 and 6 passengers.<br />
@@ -347,11 +349,11 @@
              <br />
              Messaging is about the ways a visualisation communicates observations to the user. <br />
              <b>Captions/Headlines</b> are used, as the page is divided into subsections, each with a descriptive headline. <br />
-             <b>Annotations</b> are used as for each graph there is a note of explanation describing for the user
+             <b>Annotations</b> are used as for each graph, there is an explanation describing for the user
              the most important parts of the graph. <br />
              We used <b>Introductory Text</b> as it fitted well in the beginning of the page, introducing to the reader what
              the page is about and how it works. <br />
-             At the end of the page theres a <b>Summary</b>, a brief text describing the main points of the visualisations.
+             At the end of the page theres a <b>Summary</b>, a brief text describing our conclusions of the data analyses.
           </p>
 
 
@@ -381,26 +383,29 @@
           <b>What went well?</b>
           <p>
             Overall the execution of our plan for this analysis project went great.
-            As in most cases when you work with real and massive amount of data the
+            As in most cases when you work with real and massive amount of data, the
             data cleaning and preprocessing takes some time, getting a good understanding
-            of the data, detect outliers and make it useable. Even it took quite of time
-            and effort we didn't hit any major problems with it.
+            of the data, detect outliers and make it useable. Even though it took quite of time
+            and effort we didn't meet any major problems doing it.
           </p>
           <p>
             We had to fine tune little bit how we wanted to structure our story and
             visualisation after getting feedback from Assignment 1. After that was done
             it went really well building the visualisation as we have had some good experience
-            from all of the weekly exercise and because we had prepared the story structure
+            from all of the weekly exercises and because we had prepared the story structure
             really well.
           </p>
 
           <b>What is still missing? What could be improved?, Why?</b>
           <p>
-            We think we covered all the main areas for this story and this case, which we wanted
-            to examine. But if we were going to dig even deeper we would ...
-          </p>
-          <p class="todo">
-            TODO: finish what is missing and/or could be improved and why
+            We believe that we covered all the main areas of the topics we chose; analysing the trip duration
+            and pickup hour, and the passenger count. However, for the passenger count, we expected to get
+            more descrete results showing more difference for each zone regarding the amount of passengers.
+            Instead, we figured out that majority of all taxi trips, regardless of passenger counts, begin
+            in Manhattan, JFK airport or LaGuardia airport.
+            For further research it would be interesting to examine in more details if the duration of the taxi trip
+            depends on how many passengers there are. In connection to that, it would be interesting to analyse from which
+            zones the longest or shortest taxi trips begin.
           </p>
 
 
