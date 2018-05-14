@@ -198,7 +198,42 @@
             &nbsp;   hours, minutes  <br />
             ORDER BY  <br />
             &nbsp;   minutes  <br />
-
+          </code>
+          <code>
+            <h4>Total fare amount with 1 passenger:</h4>
+            SELECT <br />
+            &nbsp;  SUM(fare_amount) AS num, <br />
+            FROM <br />
+            &nbsp;  [social-data-dtu:green_text.all17] <br />
+            WHERE <br />
+            &nbsp;  passenger_count = 1 <br />
+          </code>
+          <code>
+            <h4>Total tip amount with 1 passenger:</h4>
+            SELECT <br />
+            &nbsp;  SUM(tip_amount) AS num, <br />
+            FROM <br />
+            &nbsp;  [social-data-dtu:green_text.all17] <br />
+            WHERE <br />
+            &nbsp;  passenger_count = 1 <br />
+          </code>
+          <code>
+            <h4>Total fare amount with more than 1 passenger:</h4>
+            SELECT <br  />
+            &nbsp;  SUM(fare_amount) AS num, <br  />
+            FROM <br  />
+            &nbsp;  [social-data-dtu:green_text.all17] <br  />
+            WHERE <br  />
+            &nbsp;  passenger_count > 1 <br  />
+          </code>
+          <code>
+            <h4>Total tip amount with more than 1 passenger:</h4>
+            SELECT <br />
+            &nbsp;  SUM(tip_amount) AS num, <br />
+            FROM <br />
+            &nbsp;  [social-data-dtu:green_text.all17] <br />
+            WHERE <br />
+            &nbsp;  passenger_count > 1 <br />
           </code>
           <p class="todo">
             TODO: add the missing data queries.
