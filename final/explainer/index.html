@@ -63,6 +63,11 @@
               font-size: 15px;
             }
 
+            .img_center {
+              display: flex;
+              justify-content: center;
+            }
+
         </style>
     </head>
     <body>
@@ -159,8 +164,18 @@
             To create visualisations on a webpage which has to be fast, it was critical to run some queries to
             only get the necessary data for the visualisation. After the story had been decided and the
             visualisation had been chosen, queries were run to extract necessary data from the dataset.
-            The extracted data was stored locally on the web server in several CSV (.csv) files. The following
-            queries were used:
+            The extracted data was stored locally on the web server in several CSV (.csv) files. They can be found
+            under these two links:
+            <ul>
+              <li>
+                <a href="https://github.com/thorhildurj/socialdata2018/tree/master/final" target="_blank">https://github.com/thorhildurj/socialdata2018/tree/master/final</a>
+              </li>
+              <li>
+                <a href="https://github.com/thorhildurj/socialdata2018/tree/master/final/data" target="_blank">https://github.com/thorhildurj/socialdata2018/tree/master/final/data</a>
+              </li>
+            </ul>
+
+            The following queries were used:
           </p>
           <code>
             <h4>Number of trips and hours:</h4>
@@ -291,13 +306,19 @@
               <li>total_amount</li>
             </ul>
           </p>
-          <p class="todo">
+          <p>
             Here are two graphs showing the number of taxi rides categories by passenger count, and number of taxi rides by the pick up hour.
             <br />
             <br />
-            <img src="graph1.png" alt="Taxi rides by passenger count" width="400" height="250" >
+            <div class="img_center">
+              <img src="graph1.png" alt="Taxi rides by passenger count" width="400" height="250" >
+            </div>
+
             <br />
-            <img src="graph2.png" alt="Pickup Hour" width="400" height="250">
+            <div class="img_center">
+              <img src="graph2.png" alt="Pickup Hour" width="400" height="250">
+            </div>
+
           </p>
 
 
@@ -305,7 +326,7 @@
 
           <!-- SECTION: 3 -->
           <h2>3. Genre. Which genre of data story did you use?</h2>
-          <p class="todo">
+          <p>
             The genre chosen was Annotated Chart. This genre was chosen as we thought it would fit best our data story.
             Charts and graphs can convey so much information and it is common that people know how to read information from them.
             If some certain information is to be pointed out to the reader, that can be conveyed by annotations on the chart. This feature
@@ -364,7 +385,7 @@
           <h2>4. Visualisations</h2>
 
           <b>Explain the visualisations you’ve chosen.</b>
-          <p class="todo">
+          <p>
             We chose to use three different kind of visualisations; bar charts, geo map and doughnut charts.
             <br />
             Bar charts can be useful when comparing various amounts, frequency or measures. On bar charts it is easy
@@ -379,7 +400,7 @@
           </p>
 
           <b>Why are they right for the story you want to tell?</b>
-          <p class="todo">
+          <p>
             Bar charts were chosen for three visualisations; Amount of passengers per taxi ride, Pickup Hour and Trip duration. The reason we chose bar charts
             is because we were comparing frequency and bar charts are very useful when comparing such data.
             <br />
@@ -439,9 +460,10 @@
 
           <h2>Contribution</h2>
           <p>
-            s172174 - Olafur Orn Gudmundsson: Was responsible for the pickup hour and trip duration chapter. He also wrote the Motiviation, Basic stats and Discussion
+            s172174 - Olafur Orn Gudmundsson: Was responsible for the pickup hour and trip duration chapter as well as the doughnut charts part. He also wrote the Motiviation, Basic stats and Discussion
             for the Explainer page.
-            <br />
+          </p>
+          <p>
             s172577 - Thorhildur Jensdottir: Was responsible for the geo map visualisation and the discussion connected to the passenger count in each taxi trip.
             She wrote the Genre and Visualizations for the Explainer page.
           </p>
