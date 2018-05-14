@@ -148,7 +148,8 @@
           </p>
           <p>
             Our findings on how New York City taxi drivers can use data to increase their chances to earn more money
-            is shown below. Especially, the effect on how many passengers are in each trip and the duration of each taxi trip was examined.
+            is shown below. Particularly, the effect on how many passengers were in each taxi ride and the duration of each taxi trip was examined
+            for yellow taxi cabs the year 2017.
           </p>
 
           <img src="./taxis.jpg" class="taxi_pic"/>
@@ -160,22 +161,32 @@
           <div class="website-container-inner">
             <h2>Where is the place to go for a taxi driver that is looking for a certain amount of passengers?</h2>
             <p>
-              On the map below you can find how many taxi trips began in a taxi zone.
+              On the map below you can find how many taxi rides began in each taxi zone.
               The check boxes filter amount of taxi trips after how many passengers there were.
-              When no checkbox is selected the amount of all taxi trips, regardless of how many
+              When no checkbox is selected the total amount of all taxi trips for each zone, regardless of how many
                passengers there were, is shown by default.
               When hovering over each zone you can find the name of the zone and the number of taxi rides that began
               in that zone with the chosen passengers amount.
+              <br/>
+              <br/>
+              <br/>
             </p>
 
 
 
             <div class="map_container">
               <div id="geoMap">
-                <h3>Passenger amount for each zone</h3>
+                <h3>Passenger amount per ride <br/> in each zone</h3>
               </div>
 
               <div id="geoMap_checkbox">
+                <br  />
+                <br  />
+                <br  />
+                <br  />
+                <br  />
+                <br  />
+
                 <h4>Choose how many passengers</h4>
                 <ul>
                   <li> <input type="checkbox" id="myCheck1" onclick="updateChartBar()">
@@ -221,6 +232,34 @@
                 get sligtly more tips for the trip.
               </p>
             </div>
+            <br  />
+            <br  />
+            <br  />
+            <br  />
+            <br  />
+            <p>
+              The following barchart displays the total amount of taxi rides categoriesed by how many passengers there were.
+              For the year 2017, there were in total around 100 million yellow taxi rides.
+              <br  />
+              <br  />
+            </p>
+
+            <div id="passenger_bar"></div>
+
+            <p>
+              <br  />
+              <br  />
+              According to the NYC Taxi & Limousine Commission, the maximum amount of passengers allowed by law
+              in a traditional cab is four, and in a five passenger cab, that looks like a minivan, five passengers are allowed.
+              However, in addition to the passenger limit, a child under the age of 7 is allowed to sit on a passenger lab.
+              On the bar chart below, it is clear that in 2017 it was most likly that a taxi driver had one passenger in each ride.
+
+            </p>
+
+
+
+
+
 
 
             <div class="website-container-inner">
@@ -536,6 +575,113 @@
                            }
                         });
            }
+
+           /***************************************************************
+           *****             Barchart for number of passengers        *****
+           ****************************************************************/
+
+
+           // Next we declare some usefule variables
+           var possiblePassengers = [1, 2, 3, 4, 5, 6];
+           //var positionsHoursOnly = [];
+           var xScaleBarPassengers, yScaleBarPassengers, svgBarPassengers, xAxisBarPassengers, yAxisBarPassengers;
+
+
+           d3.csv("data/passengerCount_all17.csv", function(data) {
+             var datasetPassengers = data;
+
+             // lets create the scales
+             xScaleBarPassengers = d3.scaleBand()
+               .domain(possiblePassengers)
+               .rangeRound([padding * 2, width])  // 'rangeRound' enables rounding | double padding to make room for the numbers
+               .paddingInner(0.5);
+
+             yScaleBarPassengers = d3.scaleLinear()
+               .domain([0, d3.max(datasetPassengers, function(d) { return d.num; })])
+               .range([height - padding, padding * 2]); // double padding on the top to have room for title
+
+             //Create SVG element
+             svgBarPassengers = d3.select("#passenger_bar")
+                     .append("svg")
+                     .attr("width", width)
+                     .attr("height", height);
+
+             //Create the bars
+             svgBarPassengers.selectAll("rect")
+                .data(datasetPassengers)
+                .enter()
+                .append("rect")
+                .attr("x", function(d) {
+                   return xScaleBarPassengers(d.passenger_count);  // Setting x values
+                })
+                .attr("y", function(d) {
+                   return yScaleBarPassengers(d.num);
+                })
+                .attr("width", xScaleBarPassengers.bandwidth())
+                .attr("height", function(d) {
+                   return height - yScaleBarPassengers(d.num) - padding;
+                })
+                .attr("fill", function(d) {
+                  return "#25b898"
+                });
+
+              // Define X axis
+              xAxisBarPassengers = d3.axisBottom()
+                  .scale(xScaleBarPassengers)
+                  .tickValues(possiblePassengers);
+
+              //Define Y axis
+              yAxisBarPassengers = d3.axisLeft()
+                        .scale(yScaleBarPassengers)
+                        .ticks(5);
+
+              //Create X axis
+              svgBarPassengers.append("g")
+                 .attr("class", "x axis")
+                 .attr("transform", "translate(0," + (height - padding) + ")")
+                 .call(xAxisBarPassengers);
+
+              //Create Y axis
+              svgBarPassengers.append("g")
+                .attr("class", "y axis")
+                .attr("transform", "translate(" + padding * 2 + ",0)") // double padding to make room for the numbers
+                .call(yAxisBarPassengers);
+
+              // Setting y label
+              svgBarPassengers.append("text")
+                 .attr("transform", "rotate(-90)")
+                 .attr("y", 0)
+                 .attr("x",0 - (height / 2))
+                 .attr("dy", "1em")
+                 .style("text-anchor", "middle")
+                 .style("font-weight", "bolder")
+                 .style("font-size", "10px")
+                 .text("# of taxi trips");
+
+             // Setting x label
+             svgBarPassengers.append("text")
+                .attr("y", height - 15)
+                .attr("x", (width / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .style("font-weight", "bolder")
+                .style("font-size", "10px")
+                .text("Amount of passengers");
+
+              // Setting the title
+              svgBarPassengers.append("text")
+                 .attr("x", width / 2)
+                 .attr("y", padding) // we want little bit of padding from the top
+                 .attr("text-anchor", "middle")
+                 .style("font-size", "19px")
+                 .style("font-weight", "bolder")
+                 .text("Amount of passengers per taxi ride");
+
+
+
+
+           });
+
 
 
           /***************************************************************

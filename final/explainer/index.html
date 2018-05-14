@@ -235,9 +235,40 @@
             WHERE <br />
             &nbsp;  passenger_count > 1 <br />
           </code>
-          <p class="todo">
-            TODO: add the missing data queries.
-          </p>
+          <code>
+            <h4>Counting the taxi rides grouping by the amount of passengers :</h4>
+            SELECT <br />
+            &nbsp;  passenger_count, <br />
+            &nbsp;  COUNT(*) AS num, <br />
+            FROM <br />
+            &nbsp;  [social-data-dtu:green_text.all17] <br />
+            WHERE <br />
+            &nbsp;  passenger_count is not null AND <br />
+            &nbsp;  passenger_count != 0 AND <br />
+            &nbsp;  passenger_count < 20 AND <br />
+            GROUP BY <br />
+            &nbsp;  passenger_count<br />
+            ORDER BY <br />
+            &nbsp;  passenger_count<br />
+          </code>
+          <code>
+            <h4>Counting how many taxi rides there were that contained certain amount of passenger per zone :</h4>
+            SELECT <br />
+            &nbsp;  PUlocationID, passenger_count,<br />
+            &nbsp;  COUNT(*) AS num, <br />
+            FROM <br />
+            &nbsp;  [social-data-dtu:green_text.all17] <br />
+            WHERE <br />
+            &nbsp;  passenger_count is not null AND <br />
+            &nbsp;  passenger_count != 0 AND <br />
+            &nbsp;  passenger_count < 7 AND <br />
+            GROUP BY <br />
+            &nbsp;  PUlocationID, passenger_count<br />
+            ORDER BY <br />
+            &nbsp;  PUlocationID<br />
+          </code>
+
+
 
           <b>Write a short section that discusses the dataset stats, containing key points/plots from your exploratory data analysis.</b>
           <p>
