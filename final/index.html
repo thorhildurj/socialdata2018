@@ -83,7 +83,7 @@
               padding: 7px 20px 7px 20px;
             }
 
-            #hours_chart1, #duration_chart1 {
+            #hours_chart1, #duration_chart1, #pie1, #pie2 {
               align-self: center;
             }
 
@@ -192,7 +192,36 @@
                        <span class="chart-option"> 6 </span> </li>
                 </ul>
               </div>
+
+
             </div>
+
+
+            <div class="website-container-inner">
+              <p>
+                It can also be examined if people pay more or less in tips if there is more passengers.
+                Below, there is two doughnuts charts showing how much the tips and fare amount of the total trip cost.
+              </p>
+              <p class="subtitle">
+                Rate between fare amount and trip amount for trips with 1 passenger
+              </p>
+              <div id="pie1"></div>
+              <br />
+              <br />
+              <br />
+              <p class="subtitle">
+                Rate between fare amount and trip amount for trips with more than 1 passenger
+              </p>
+              <div id="pie2"></div>
+              <br  />
+              <p>
+                From above doughnuts charts it can be examined that there is no significant
+                difference in how much tips taxi drivers get based on if the passenger number
+                is 1 or more. But by driving only 1 passenger taxi drivers will on average
+                get sligtly more tips for the trip.
+              </p>
+            </div>
+
 
             <div class="website-container-inner">
               <h2>When during the day is the best time to drive?</h2>
@@ -509,6 +538,113 @@
            }
 
 
+          /***************************************************************
+          *****                       PIE CHARTS                     *****
+          ****************************************************************/
+
+
+          var datasetPie1 = [ 0.8749, 0.1251 ];
+          var datasetPie2 = [ 0.8813, 0.1187 ];
+          var pieW = 300;
+          var pieH = 300;
+          var datasetPie1 = [ 0.8749, 0.1251 ];
+          var datasetPie2 = [ 0.8813, 0.1187 ];
+          var outerRadius = pieW / 2;
+          var innerRadius = pieW / 3;
+
+
+          //  ------  FIRST PIE
+          var arc1 = d3.arc()
+                .innerRadius(innerRadius)
+                .outerRadius(outerRadius);
+
+          var pie1 = d3.pie();
+
+          //Easy colors accessible via a 10-step ordinal scale
+          var color = d3.scaleOrdinal(d3.schemeCategory10);
+          //Create SVG element
+          var svgPie1 = d3.select("#pie1")
+                .append("svg")
+                .attr("width", pieW)
+                .attr("height", pieH);
+
+          //Set up groups
+          var arcs1 = svgPie1.selectAll("g.arc")
+                  .data(pie1(datasetPie1))
+                  .enter()
+                  .append("g")
+                  .attr("class", "arc")
+                  .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+
+          //Draw arc paths
+          arcs1.append("path")
+              .attr("fill", function(d, i) {
+                return color(i);
+              })
+              .attr("d", arc1);
+
+          //Labels
+          arcs1.append("text")
+              .attr("transform", function(d) {
+                return "translate(" + arc1.centroid(d) + ")";
+              })
+              .attr("text-anchor", "middle")
+              .text(function(d) {
+                var value = Math.floor(d.value * 1000)/ 10;
+                var description = '';
+                if (value < 50) {
+                  description = "Tips: "
+                } else {
+                  description = "Fare: "
+                }
+                return description + "" + value + "%";
+              });
+
+
+          //  ------  SECOND PIE
+          var arc2 = d3.arc()
+                .innerRadius(innerRadius)
+                .outerRadius(outerRadius);
+
+          var pie2 = d3.pie();
+
+          //Create SVG element
+          var svgPie2 = d3.select("#pie2")
+                .append("svg")
+                .attr("width", pieW)
+                .attr("height", pieH);
+
+          //Set up groups
+          var arcs2 = svgPie2.selectAll("g.arc")
+                  .data(pie2(datasetPie2))
+                  .enter()
+                  .append("g")
+                  .attr("class", "arc")
+                  .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+
+          //Draw arc paths
+          arcs2.append("path")
+              .attr("fill", function(d, i) {
+                return color(i);
+              })
+              .attr("d", arc2);
+
+          //Labels
+          arcs2.append("text")
+              .attr("transform", function(d) {
+                return "translate(" + arc2.centroid(d) + ")";
+              })
+              .attr("text-anchor", "middle")
+              .text(function(d) {
+                var value = Math.floor(d.value * 1000)/ 10;
+                var description = '';
+                if (value < 50) {
+                  description = "Tips: "
+                } else {
+                  description = "Fare: "
+                }
+                return description + "" + value + "%";
+              });
 
           /***************************************************************
           *****               Barcharts with hours only              *****
