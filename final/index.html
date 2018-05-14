@@ -164,9 +164,9 @@
               On the map below you can find how many taxi rides began in each taxi zone.
               The check boxes filter amount of taxi trips after how many passengers there were.
               When no checkbox is selected the total amount of all taxi trips for each zone, regardless of how many
-               passengers there were, is shown by default. The darker green the zone is, the more taxi rides began in that particular zone.
+               passengers there were, is shown by default. The more darker the zone is, the more taxi rides began in that particular zone.
               When hovering over each zone you can find the name of the zone and the number of taxi rides that began
-              in that zone with the chosen passengers amount.
+              in that zone, filter by the chosen passengers amount.
               <br/>
               <br/>
               <br/>
@@ -187,7 +187,7 @@
                 <br  />
                 <br  />
 
-                <h4>Choose how many passengers</h4>
+                <h4>Choose how many passengers:</h4>
                 <ul>
                   <li> <input type="checkbox" id="myCheck1" onclick="updateChartBar()">
                        <span class="chart-option"> 1 </span> </li>
@@ -231,8 +231,9 @@
               However, in addition to the passenger limit, a child under the age of 7 is allowed to sit on a passenger lab.
               When examining the bar chart it is clear that in 2017 it was most likely that a taxi driver had one passenger in the car.<br  />
               It is interesting how many taxi rides had 5 and 6 passengers, compared to 3 and 4, telling us that there is really a need for
-              the bigger caps. When there where 6 passengers in a ride we assume that one passenger was a young child or everyone just squeezed
-              comfortably into the cab.
+              the bigger caps (when there were 6 passengers in a ride we assume that one passenger was a young child).
+              Regardless, there is no extra charge for extra passengers [1] and therefore the provocation for taxi drivers to
+              drive a bigger taxi is not much as 5 and 6 passenger only account for about 8% of all taxi rides.
             </p>
 
             <br  />
@@ -339,7 +340,11 @@
               <p>
                 New York City taxi drivers can try to maximize their income by taking data-driven decisions.
                 From the visualisation above, drivers can understand where and when they should drive to increase
-                their chances of earning more money.
+                their chances of earning more money. Our conclusion is that if a taxi river wants to maximize his
+                taxi rides per shift, consequently getting higher income, he should drive between 17:00-22:00, in Manhattan,
+                at LaGuardia airport or JFK airport.
+
+
               </p>
             </div>
 
@@ -358,6 +363,11 @@
               Link to the Github repo for this project: <a href="https://github.com/thorhildurj/socialdata2018" target="blank">https://github.com/thorhildurj/socialdata2018</a>
             </p>
             <br />
+
+            <h3>References</h3>
+            <p>
+              [1] NYC taxi & Limousine Commission. (2018). Retrieved from: <a href="http://www.nyc.gov/html/tlc/html/passenger/taxicab_rate.shtml#ExtraPassengerAndLuggage" target="blank">http://www.nyc.gov/html/tlc/html/passenger/</a>
+            </p>
 
             <img src="./taxis2.jpg" class="taxi_pic"/>
             <span class="pic_text">
@@ -460,7 +470,8 @@
 
           //Define quantize scale to sort data values into buckets of color
            colorMap = d3.scaleQuantize()
-                        .range(["#C8E6C9","#A5D6A7","#81C784","#66BB6A", "#4CAF50", "#43A047", "#388E3C", "#2E7D32", "#1B5E20", "#123f15", "#0a260c"]);
+                        //.range(["#C8E6C9","#A5D6A7","#81C784","#66BB6A", "#4CAF50", "#43A047", "#388E3C", "#2E7D32", "#1B5E20", "#123f15", "#0a260c"]);
+                        .range(["#F9FBE7", "#F0F4C3", "#E6EE9C", "#DCE775", "#D4E157", "#AED581","#A5D6A7","#81C784","#66BB6A", "#4CAF50", "#43A047", "#388E3C", "#2E7D32", "#1B5E20", "#123f15", "#0a260c", "#212121"]);
 
 
     			//Create SVG element
