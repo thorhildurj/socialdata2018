@@ -119,6 +119,12 @@
               margin-bottom: -20px;
             }
 
+            .map_container{
+              display: flex;
+              flex-direction: row;
+              justify-content: space-around;
+            }
+
         </style>
     </head>
     <body>
@@ -135,14 +141,14 @@
 
         <div class="website-container">
 
-          <h1 class="assignment-header">How to use data to gain leverage as a New York City taxi driver</h1>
+          <h1 class="assignment-header">Use data to gain more profit as a New York City taxi driver</h1>
           <p class="subtitle subtitle-less-spacing">
             New York City drivers can use data as an advantage and take data-driven decisions to maximize
             their income.
           </p>
           <p>
-            Our findings on how New York City drivers can use data, to increase their chances on earning more money,
-            will be shown below.
+            Our findings on how New York City taxi drivers can use data to increase their chances to earn more money
+            is shown below. Especially, the effect on how many passengers are in each trip and the duration of each taxi trip was examined.
           </p>
 
           <img src="./taxis.jpg" class="taxi_pic"/>
@@ -152,39 +158,40 @@
           </span>
 
           <div class="website-container-inner">
-            <h2>Some clever title here</h2>
+            <h2>Where is the place to go for a taxi driver that is looking for a certain amount of passengers?</h2>
             <p>
-              We analyzed data for NYC taxi trips and we will show our findings here.
+              On the map below you can find how many taxi trips began in a taxi zone.
+              The check boxes filter amount of taxi trips after how many passengers there were.
+              When no checkbox is selected the amount of all taxi trips, regardless of how many
+               passengers there were, is shown by default.
+              When hovering over each zone you can find the name of the zone and the number of taxi rides that began
+              in that zone with the chosen passengers amount.
+            </p>
 
+
+
+            <div class="map_container">
               <div id="geoMap">
-                <h3>Here is geoMap</h3>
+                <h3>Passenger amount for each zone</h3>
+              </div>
 
+              <div id="geoMap_checkbox">
+                <h4>Choose how many passengers</h4>
                 <ul>
-                  <li onclick="updateChartBar(1)"><span class="chart-option">Passenger amount: 1</span></li>
-                  <li onclick="updateChartBar(2)"><span class="chart-option">Passenger amount: 2</span></li>
-                  <li onclick="updateChartBar(3)"><span class="chart-option">Passenger amount: 3</span></li>
-                  <li onclick="updateChartBar(4)"><span class="chart-option">Passenger amount: 4</span></li>
-                  <li onclick="updateChartBar(5)"><span class="chart-option">Passenger amount: 5</span></li>
-                  <li onclick="updateChartBar(6)"><span class="chart-option">Passenger amount: 6</span></li>
+                  <li> <input type="checkbox" id="myCheck1" onclick="updateChartBar()">
+                       <span class="chart-option"> 1 </span> </li>
+                  <li> <input type="checkbox" id="myCheck2" onclick="updateChartBar()">
+                       <span class="chart-option"> 2 </span> </li>
+                  <li> <input type="checkbox" id="myCheck3" onclick="updateChartBar()">
+                       <span class="chart-option"> 3 </span> </li>
+                  <li> <input type="checkbox" id="myCheck4" onclick="updateChartBar()">
+                       <span class="chart-option"> 4 </span> </li>
+                  <li> <input type="checkbox" id="myCheck5" onclick="updateChartBar()">
+                       <span class="chart-option"> 5 </span> </li>
+                  <li> <input type="checkbox" id="myCheck6" onclick="updateChartBar()" >
+                       <span class="chart-option"> 6 </span> </li>
                 </ul>
-
-              <h2>Choose how many passengers</h2>
-              <ul>
-                <li> <input type="checkbox" id="myCheck1" onclick="updateChartBar(1)">
-                     <span class="chart-option"> 1 </span> </li>
-                <li> <input type="checkbox" id="myCheck2" onclick="updateChartBar(2)">
-                     <span class="chart-option"> 2 </span> </li>
-                <li> <input type="checkbox" id="myCheck3" onclick="updateChartBar(3)">
-                     <span class="chart-option"> 3 </span> </li>
-                <li> <input type="checkbox" id="myCheck4" onclick="updateChartBar(4)">
-                     <span class="chart-option"> 4 </span> </li>
-                <li> <input type="checkbox" id="myCheck5" onclick="updateChartBar(5)">
-                     <span class="chart-option"> 5 </span> </li>
-                <li> <input type="checkbox" id="myCheck6" onclick="updateChartBar(6)" >
-                     <span class="chart-option"> 6 </span> </li>
-              </ul>
-
-
+              </div>
             </div>
 
             <div class="website-container-inner">
@@ -304,67 +311,102 @@
 
         //Function to make a new subset dataset for passenger count on map
         var getSubDataset = function (datasetWithAllTypes, passengerIndex) {
-          var dataset = [];
-          for (var i = 0; i < datasetWithAllTypes.length; i++) {
-            var entry = datasetWithAllTypes[i];
-            passenger_value = parseFloat(entry.passenger_count)
-            if (passenger_value === passengerIndex) {
-              dataset.push(entry)
+            var newDataset = [];
+
+            //Fill in the dataset with 0 values for each zone
+            for (var i = 0; i < 265; i++) {
+                    newDataset.push({
+                      'zone': i+1,
+                      'num': 0   });
             }
-          }
-          return dataset;
+
+            for (var i=0; i < datasetWithAllTypes.length; i++){
+              var entry = datasetWithAllTypes[i];
+              var zone = parseFloat(entry.PULocationID);
+              var passengerValue = parseFloat(entry.passenger_count);
+
+              for (var j=0; j < passengerIndex.length; j++){
+                if (passengerValue == passengerIndex[j]) {
+                  var zoneObject = newDataset[zone - 1];
+                  zoneObject.num += parseFloat(entry.num);
+                  newDataset[zone - 1] = zoneObject;
+                }
+              }
+            }
+            return newDataset;
         }
 
+        //Function that checks what passenger count is checked in the checkboxes
+        var isChecked = function (){
+          var passengerIndexList = [];
+
+          for (var i=1; i < 7; i++){
+            var idCheck = "myCheck"+i
+            if (document.getElementById(idCheck).checked){
+              passengerIndexList.push(i)
+            }
+          }
+          if (passengerIndexList.length == 0){
+            passengerIndexList = [1,2,3,4,5,6];
+          }
+          return passengerIndexList;
+        }
+
+        /************** GEOMAP STARTS *************/
+        /******************************************/
         //Width and height
-        var wMap = 600;
-        var hMap = 600;
+        var wMap = 550;
+        var hMap = 550;
         var datasetWithAllPassengers;
         var jsonData;
-        var passengerIndex = 7;
+        var passengerIndex = [1,2,3,4,5,6];  //all passenger counts chosen first
+
+        var colorMap;
+        var projection;
+        var path;
+        var svgMap;
+
+        //Load in GeoJSON data
+        d3.json("taxizones.json", function(json) {
+    			//Note: You need to lower the translate and make scale higher to make it a bigger map
+          projection = d3.geoMercator()
+                             //.translate([wMap/0.01059, hMap/0.01752])
+                             //.scale([43600]);
+                             .fitSize([wMap, hMap], json);
+
+    			//Define path generator
+    			 path = d3.geoPath()
+    						       .projection(projection);
+
+          //Define quantize scale to sort data values into buckets of color
+           colorMap = d3.scaleQuantize()
+                        .range(["#C8E6C9","#A5D6A7","#81C784","#66BB6A", "#4CAF50", "#43A047", "#388E3C", "#2E7D32", "#1B5E20", "#123f15", "#0a260c"]);
 
 
-  			//Note: You need to lower the translate and make scale higher to make it a bigger map
-        var projection = d3.geoMercator()
-                           .translate([wMap/0.01087, hMap/0.01795])
-                           .scale([42500]);
+    			//Create SVG element
+    			 svgMap = d3.select("#geoMap")
+          						.append("svg")
+          						.attr("width", wMap)
+          						.attr("height", hMap);
 
-  			//Define path generator
-  			var path = d3.geoPath()
-  						       .projection(projection);
+          //Load in taxi zonedata
+          d3.csv("zones_passengers_all17.csv", function(data){
 
-        //Define quantize scale to sort data values into buckets of color
-        var colorMap = d3.scaleQuantize()
-                      .range(["rgb(237,248,233)","rgb(186,228,179)","rgb(116,196,118)","rgb(49,163,84)","rgb(0,109,44)"]);
+            datasetWithAllPassengers = data;
+            jsonData = json;
+            var passengerValue = 0;
+            var subDataset = getSubDataset(datasetWithAllPassengers, passengerIndex);
 
-
-  			//Create SVG element
-  			var svgMap = d3.select("#geoMap")
-        						.append("svg")
-        						.attr("width", wMap)
-        						.attr("height", hMap);
-
-        //Load in taxi zonedata
-        d3.csv("zones_passengers_all17.csv", function(data){
-
-          //Load in GeoJSON data
-          d3.json("taxizones.json", function(json) {
-
-          datasetWithAllPassengers = data;
-          jsonData = json;
-          var subDataset = getSubDataset(datasetWithAllPassengers, passengerIndex, jsonData);
-
-          //Set input domain for color scale
-          colorMap.domain([
-                  d3.min([0]),
-                  d3.max(subDataset, function(d) {return d.num; })
-                  ]);
+            //Set input domain for color scale
+            colorMap.domain([d3.min([0]),
+                             d3.max(subDataset, function(d) {return d.num; })
+                            ]);
 
             //Merge the taxi data and GeoJSON. Loop through once for each taxi data value
             for (var i = 0; i < subDataset.length; i++) {
               //Lets grap the id of the zone
-              var zoneID = subDataset[i].PULocationID;
-              //Grab the passenger value, and convert from string to float
-              var passengerValue = parseFloat(subDataset[i].num);
+              var zoneID = subDataset[i].zone;
+              passengerValue = subDataset[i].num;
 
               //Find the corresponding state inside the GeoJSON
               for (var j = 0; j < jsonData.features.length; j++) {
@@ -377,6 +419,7 @@
                 }
               }
             }
+
             //Bind data and create one path per GeoJSON feature
     				svgMap.selectAll("path")
     				   .data(jsonData.features)
@@ -389,112 +432,80 @@
                     return colorMap(value);
                   } else {
                     //If value is undefined
-                    return "#ccc";
-                  }
+                    return "#ccc";}
+               })
+               .style("fill-opacity","1")
+               .attr("stroke-width", 0.1)
+               .attr("stroke", "black")
+               .on("mouseover", function(d) {  //Create tooltip
+                 var xPosition = 350 ;  //Make tooltip be at this position
+                 var yPosition = 520 ;
+                 d3.select(this).style("fill-opacity","0.7");
+
+                 //Create the tooltip label
+                 svgMap.append("text")
+                   .attr("id", "tooltip")
+                   .attr("x", xPosition)
+                   .attr("y", yPosition)
+                   .attr("text-anchor", "middle")
+                   .attr("font-family", "sans-serif")
+                   .attr("font-size", "11px")
+                   .attr("fill", "black")
+                   .text("Zone: "+ d.properties.zone + " - Number of taxi trips: "  + d.properties.valueP);
+               })
+               .on("mouseout", function() {
+                   d3.select("#tooltip").remove(); //Remove the tooltip
+                   d3.selectAll("path").style("fill-opacity","1");
                });
     			   });
            });
 
-           //Function to update the map when clicking the buttons
-           var updateChartBar = function(passengerIndex) {
-             //Bind the myCheck og passengerIndex together
-             var idCheck = "myCheck"+passengerIndex
+           //Function to update the map when clicking the checkbuttons
+           var updateChartBar = function() {
+               //find out which checkboxes are checked and should be displayed on the map
+               passengerIndex = isChecked();
 
-             //lets check if the box is checked or unchecked
-             if (document.getElementById(idCheck).checked){
-               console.log("hann er checked")
                //get the subdataset
                var subDataset = getSubDataset(datasetWithAllPassengers, passengerIndex, jsonData);
 
                //now update the map
-               colorMap.domain([
-                       d3.min([0]),
-                       d3.max(subDataset, function(d) {return d.num; })
-                       ]);
+               colorMap.domain([d3.min([0]),
+                                d3.max(subDataset, function(d) {return d.num; })
+                                ]);
 
-                 //Merge the taxi data and GeoJSON. Loop through once for each taxi data value
-                 for (var i = 0; i < subDataset.length; i++) {
-                   //Lets grap the id of the zone
-                   var zoneID = subDataset[i].PULocationID;
-                   //Grab the passenger value, and convert from string to float
-                   var passengerValue = parseFloat(subDataset[i].num);
+                //Merge the taxi data and GeoJSON. Loop through once for each taxi data value
+                for (var i = 0; i < subDataset.length; i++) {
+                  //Lets grap the id of the zone
+                  var zoneID = subDataset[i].zone;
+                  passengerValue = subDataset[i].num;
 
-                   //Find the corresponding state inside the GeoJSON
-                   for (var j = 0; j < jsonData.features.length; j++) {
-                     var jsonZone = jsonData.features[j].properties.locationid;
-                     if (zoneID == jsonZone) {
-                       //Copy the data value into the JSON
-                       jsonData.features[j].properties.valueP = passengerValue;
-                       //Stop looking through the JSON
-                       break;
-                     }
-                   }
-                 }
+                  //Find the corresponding state inside the GeoJSON
+                  for (var j = 0; j < jsonData.features.length; j++) {
+                    var jsonZone = jsonData.features[j].properties.locationid;
+                    if (zoneID == jsonZone) {
+                      //Copy the data value into the JSON
+                      jsonData.features[j].properties.valueP = passengerValue;
+                      //Stop looking through the JSON
+                      break;
+                    }
+                  }
+                }
+
                  //Bind data and create one path per GeoJSON feature
                 svgMap.selectAll("path")
-                   .data(jsonData.features)
-                   .transition()
-                   .duration(800)
-                   .attr("d", path)
-                   .style("fill", function(d) {
-                       var value = d.properties.valueP;
-                       if (value) {
-                         return colorMap(value);
-                       } else {
-                         //If value is undefined
-                         return "#ccc";
-                       }
-                    });
-             }
-             else{
-               console.log("uncheck :( )")
-               var subDataset = getSubDataset(datasetWithAllPassengers, 7, jsonData);
-
-               //now update the map
-               colorMap.domain([
-                       d3.min([0]),
-                       d3.max(subDataset, function(d) {return d.num; })
-                       ]);
-
-                 //Merge the taxi data and GeoJSON. Loop through once for each taxi data value
-                 for (var i = 0; i < subDataset.length; i++) {
-                   //Lets grap the id of the zone
-                   var zoneID = subDataset[i].PULocationID;
-                   //Grab the passenger value, and convert from string to float
-                   var passengerValue = parseFloat(subDataset[i].num);
-
-                   //Find the corresponding state inside the GeoJSON
-                   for (var j = 0; j < jsonData.features.length; j++) {
-                     var jsonZone = jsonData.features[j].properties.locationid;
-                     if (zoneID == jsonZone) {
-                       //Copy the data value into the JSON
-                       jsonData.features[j].properties.valueP = passengerValue;
-                       //Stop looking through the JSON
-                       break;
-                     }
-                   }
-                 }
-                 //Bind data and create one path per GeoJSON feature
-                svgMap.selectAll("path")
-                   .data(jsonData.features)
-                   .transition()
-                   .duration(800)
-                   .attr("d", path)
-                   .style("fill", function(d) {
-                       var value = d.properties.valueP;
-                       if (value) {
-                         return colorMap(value);
-                       } else {
-                         //If value is undefined
-                         return "#ccc";
-                       }
-                    });
-
-
-             }
-
-
-
+                       .data(jsonData.features)
+                       .transition()
+                       .duration(800)
+                       .attr("d", path)
+                       .style("fill", function(d) {
+                           var value = d.properties.valueP;
+                           if (value) {
+                             return colorMap(value);
+                           } else {
+                             //If value is undefined
+                             return "#ccc";
+                           }
+                        });
            }
 
 
