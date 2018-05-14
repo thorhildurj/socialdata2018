@@ -71,7 +71,7 @@
               background-color: #039be5;
               box-shadow: 0 2px 5px 0 rgba(0,0,0,.26);
               padding: 8px 16px;
-              margin: 30px 0 0 0;
+              margin: 20px 0 0 0;
               text-decoration: none;
             }
 
@@ -164,7 +164,7 @@
               On the map below you can find how many taxi rides began in each taxi zone.
               The check boxes filter amount of taxi trips after how many passengers there were.
               When no checkbox is selected the total amount of all taxi trips for each zone, regardless of how many
-               passengers there were, is shown by default.
+               passengers there were, is shown by default. The more dark green the zone is, the more taxi rides began in that particular zone.
               When hovering over each zone you can find the name of the zone and the number of taxi rides that began
               in that zone with the chosen passengers amount.
               <br/>
@@ -207,38 +207,15 @@
 
             </div>
 
-
-            <div class="website-container-inner">
-              <p>
-                It can also be examined if people pay more or less in tips if there is more passengers.
-                Below, there is two doughnuts charts showing how much the tips and fare amount of the total trip cost.
-              </p>
-              <p class="subtitle">
-                Rate between fare amount and trip amount for trips with 1 passenger
-              </p>
-              <div id="pie1"></div>
-              <br />
-              <br />
-              <br />
-              <p class="subtitle">
-                Rate between fare amount and trip amount for trips with more than 1 passenger
-              </p>
-              <div id="pie2"></div>
-              <br  />
-              <p>
-                From above doughnuts charts it can be examined that there is no significant
-                difference in how much tips taxi drivers get based on if the passenger number
-                is 1 or more. But by driving only 1 passenger taxi drivers will on average
-                get sligtly more tips for the trip.
-              </p>
-            </div>
-            <br  />
-            <br  />
-            <br  />
-            <br  />
-            <br  />
             <p>
-              The following barchart displays the total amount of taxi rides categoriesed by how many passengers there were.
+              <br  />
+              <br  />
+              <br  />
+              The map shows that if a taxi driver wants to get as many taxi hails as possible, he should stay in the Manhattan or
+              at LaGuardia airport or JFK airport. If a driver wants to aviod driving 3, 4, 5 or 6 passengers he should stay in Staten Island.
+            </p>
+            <p>
+              The following barchart displays the total amount of taxi rides categorised by how many passengers there were.
               For the year 2017, there were in total around 100 million yellow taxi rides.
               <br  />
               <br  />
@@ -250,22 +227,60 @@
               <br  />
               <br  />
               According to the NYC Taxi & Limousine Commission, the maximum amount of passengers allowed by law
-              in a traditional cab is four, and in a five passenger cab, that looks like a minivan, five passengers are allowed.
+              in a traditional cab is four. In a five passenger cab, that looks like a minivan, five passengers are allowed.
               However, in addition to the passenger limit, a child under the age of 7 is allowed to sit on a passenger lab.
-              On the bar chart below, it is clear that in 2017 it was most likly that a taxi driver had one passenger in each ride.
-
+              When examining the bar chart it is clear that in 2017 it was most likely that a taxi driver had one passenger in the car.<br  />
+              It is interesting how many taxi rides had 5 and 6 passengers, compared to 3 and 4, telling us that there is really a need for
+              the bigger caps. When there where 6 passengers in a ride we assume that one passenger was a young child or everyone just squeezed
+              comfortably into the cab.
             </p>
 
+            <br  />
+            <br  />
+            <br  />
+            <br  />
 
+            <p>
+              Furthermore, it is interesting to examine if people pay more tip if there are more passengers in the cab.<br  />
+              Below, there are two doughnut charts showing how big portion the tip was of the total taxi trip cost.
+            </p>
 
+              <br />
+              <br />
+              <h4>
+                Rate between fare amount and trip amount for trips with 1 passenger
+              </h4>
+              <div id="pie1"></div>
 
+              <br />
 
+              <h4>
+                Rate between fare amount and trip amount for trips with 2 or more passengers
+              </h4>
+              <div id="pie2"></div>
+
+            <br  />
+            <p>
+              <br />
+              The two doughnut charts show that there is no significant difference by how much tip the driver gets depending on the amount of passengers.
+              In fact, there is slightly more likelihood to get more tip when there is only 1 passenger.
+            </p>
+            <p>
+              In conclusion, it does not matter that much if a taxi driver should target to get certain amount of passengers as the behaviour seems
+              to be very alike not depending on the passenger count. Taxi drivers should stay in Manhattan or at the two airports, LaGuardia and JFK,
+              to minimize the liklihood of not getting any customers.
+              TODOODODOD!!!!!!
+            </p>
+            <br  />
+            <br  />
+            <br  />
+            <br  />
 
 
             <div class="website-container-inner">
               <h2>When during the day is the best time to drive?</h2>
               <p class="subtitle subtitle-less-spacing">
-                How can taxi drivers use data to find out which hours they make the most money
+                How can taxi drivers use data to figure out at what time of the day they will make the most money?
               </p>
               <p>
                 Lets start looking at how many trips are there for each hour of the day:
@@ -274,33 +289,36 @@
               <p>
                 From this graph, it is possible to see that there is more demand for New York
                 taxis in the afternoon and in the evening but less demand during the morning and the nights.
-                So for taxi drivers driving on high demands time, they decrease their probability to stay idle
+                Around 4 and 5 AM the demand is at minimum.
+                So for taxi drivers driving at the hours with high demand, they decrease their probability to stay idle
                 for a long time without passengers.
               </p>
               <p>
-                But it is not enough to just look at when is the most demands for taxi drivers to maximize their
-                income. It is also matters of how long each taxi trip is, the longer the trip is, the more it cost
-                and the more money does the driver get.
+                But it is not enough to just look at when the demand is the most for taxis so taxi drivers can maximize their
+                income. It also matters of how long each taxi trip is, the longer the trip duration is, the more it costs, leading to
+                 the more money for the driver.
               </p>
+
+              <br  />
+              <br  />
+              <br  />
               <p class="subtitle">
                 Looking at trip duration for different hours of the day
               </p>
 
               <p>
-                By looking at how long the trips are in terms of time, or duration it is possible to examine
-                how long the trips are on different hours of the day.
-              </p>
-              <p>
-                Below there are two graphs to visualise that:
+                By looking at how long the trips are in terms of time, or duration, it is possible to examine
+                how long the trips are on different hours of the day.<br  />
+                <br  />
+                Below there are two graphs that visualise:
                 <ul>
                   <li>An interactive, brushable, bar chart representing number of taxi trips of each hour</li>
                   <li>Bar chart representing number of taxi trips of different trip length (in minutes) in total of all the hours selected with the hour brush in the first bar chart</li>
                 </ul>
                 With the hour brush in the first bar chart, you can play around to see how
-                the trip length of taxi trips changes for different hours, just highlight (brush)
-                specific area in the first bar chart. To see the changes more easily you can use
-                the "Animate brush" button, below the first bar chart, to see the changes visually
-                automatically.
+                the trip duration for taxi trips changes for different hours of the day, just highlight (brush)
+                specific area in the first bar chart. To see the changes more easily, you can use
+                the "Animate brush" button, below the first bar chart, to see the changes automatically.
               </p>
               <div id="hours_chart1"></div>
               <button onclick="onHoursPlay()" class="play-hour-btn">Animate brush!</button>
@@ -309,11 +327,9 @@
               <p>
                 In the above graph, the yellow bar shows where the median trip is. When the trip duration is examined for different hours (try the "Animate brush" button)
                 some useful information can be read from the visualisation. It seems that trips
-                in the afternoon and in the evening are longer (longer duration) compared to trips
-                during the night or before noon. This means that taxi drivers which want to get more
-                money from each trip should rather work in the afternoon or in the evening as longer trips cost more.
-              </p>
-              <p>
+                in the afternoon and in the evening are of longer duration compared to trips
+                during the night or before noon. This means those taxi drivers who want to get more
+                money from each trip should rather work in the afternoon or in the evening as longer trips cost more for the customer.<br />
                 From this can be seen that there is both higher demands and longer trips in the afternoon and in the evening.
               </p>
 
@@ -327,9 +343,6 @@
                 their chances of earning more money.
               </p>
             </div>
-
-
-            <br />
 
 
             <a href="explainer" class="button_bottom" target="_blank">
